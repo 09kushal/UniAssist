@@ -5,9 +5,13 @@ Django settings for UniAssist project.
 import os
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env
+load_dotenv(BASE_DIR / '.env')
 
 # SECURITY
 SECRET_KEY = 'django-insecure-uniassist-dev-secret-key-change-in-production'
@@ -26,6 +30,7 @@ INSTALLED_APPS = [
     # Third-party
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',  # Required for logout token blacklisting
     'corsheaders',
 
     # UniAssist apps
@@ -122,26 +127,34 @@ REST_FRAMEWORK = {
 
 # ─── JWT Settings ─────────────────────────────────────────────────────────────
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'ACCESS_TOKEN_LIFETIME':  timedelta(hours=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': False,
+    'ROTATE_REFRESH_TOKENS':  True,
+    'BLACKLIST_AFTER_ROTATION': True,   # Blacklist old refresh token on rotation (logout)
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
+    'USER_ID_FIELD':  'id',
+    'USER_ID_CLAIM':  'user_id',
 }
 
 # ─── CORS ─────────────────────────────────────────────────────────────────────
 CORS_ALLOW_ALL_ORIGINS = True   # Restrict to specific origins in production
 
 # ─── Email (OTP via Gmail SMTP) ───────────────────────────────────────────────
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = ''      # Set in environment
-EMAIL_HOST_PASSWORD = ''  # Set in environment
-DEFAULT_FROM_EMAIL = 'UniAssist <noreply@uniassist.com>'
+# To enable email sending:
+#   1. Use a Gmail account with 2-Step Verification enabled.
+#   2. Generate an App Password at: https://myaccount.google.com/apppasswords
+#   3. Update your backend/.env file with the credentials.
+import certifi
+import os
+os.environ['SSL_CERT_FILE'] = certifi.where()
+os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "UniAssist <noreply@uniassist.com>")
 
 # ─── OTP Settings ─────────────────────────────────────────────────────────────
 OTP_EXPIRY_MINUTES = 10  # OTP expires in exactly 10 minutes (per API_RULES.md)
@@ -152,3 +165,10 @@ TUTOR_BASE_SHARE_RATE    = 0.70   # Tutor receives 70%
 
 # ─── eSewa Payment ────────────────────────────────────────────────────────────
 ESEWA_PRODUCT_CODE = 'EPAYTEST'   # Sandbox product code
+
+
+# SSL Fix for Mac development
+
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+

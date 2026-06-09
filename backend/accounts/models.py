@@ -69,7 +69,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         choices=Role.choices,
         default=Role.STUDENT,
     )
-    is_active  = models.BooleanField(default=True)
+    is_active  = models.BooleanField(default=False)  # Activated after OTP verification
     is_staff   = models.BooleanField(default=False)   # Required by Django admin
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -307,3 +307,35 @@ class Skill(models.Model):
 
     def __str__(self):
         return f'{self.name} (by {self.tutor.user.full_name})'
+
+
+# ─── OTP Record ───────────────────────────────────────────────────────────────
+
+class OTPRecord(models.Model):
+    """
+    Stores a single active OTP per email address.
+    Used for: registration verification, password reset.
+
+    Rules (from API_RULES.md & CONTEXT.md):
+      - OTP expires in exactly 10 minutes.
+      - One OTP per email at a time — previous record is deleted before a new
+        one is created (enforced at the service layer in views.py).
+    """
+
+    email      = models.EmailField(unique=True)   # One OTP per email at a time
+    otp_code   = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()           # Set to created_at + 10 minutes
+
+    class Meta:
+        db_table     = 'otp_record'
+        verbose_name = 'OTP Record'
+        verbose_name_plural = 'OTP Records'
+
+    def __str__(self):
+        return f'OTP for {self.email} (expires {self.expires_at})'
+
+    def is_valid(self):
+        """Return True if the OTP has not yet expired."""
+        from django.utils import timezone
+        return timezone.now() <= self.expires_at

@@ -76,3 +76,8 @@ UniAssist/
 - Django migrations must be incremental and reversible
 - File uploads: JPG, PNG, PDF only — enforce in serializer validation
 - Always treat this as a dual-domain platform — never academic only
+## IMPORTANT AGENT RULES
+- Do NOT add pymysql to __init__.py
+- mysqlclient 2.2.8 is already installed and working
+- Do NOT import pymysql anywhere in the project
+- MySQL connection works via mysqlclient only

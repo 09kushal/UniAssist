@@ -1,5 +1,11 @@
 """
 UniAssist — Root URL Configuration
+
+URL prefix mapping:
+  /admin/       → Django admin panel
+  /api/auth/    → accounts app  (registration, OTP, login, logout, password reset)
+
+Media files are served in development only (DEBUG=True).
 """
 
 from django.contrib import admin
@@ -10,8 +16,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # Accounts / Auth
-    path('api/accounts/', include('accounts.urls')),
+    # Authentication & Accounts
+    path('api/auth/', include('accounts.urls', namespace='accounts')),
 ]
 
 # Serve media files in development
