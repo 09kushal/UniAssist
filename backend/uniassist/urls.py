@@ -22,6 +22,9 @@ urlpatterns = [
 
     # Tutor Discovery Module
     path('api/tutors/', include('tutors.urls', namespace='tutors')),
+
+    # Booking System Module
+    path('api/booking/', include('booking.urls', namespace='booking')),
 ]
 
 # Serve media files in development

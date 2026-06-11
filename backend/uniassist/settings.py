@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     # UniAssist apps
     'accounts',
     'tutors',
+    'booking',
 ]
 
 MIDDLEWARE = [

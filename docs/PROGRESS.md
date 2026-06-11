@@ -16,50 +16,52 @@ Update this file yourself — don't let the agent update it.
 - ✅ Django project created
 - ✅ Project folder structure set up
 - ✅ Docs folder created (CONTEXT, DATABASE_SCHEMA, API_RULES, UI_GUIDELINES, ROADMAP)
-- ⬜ requirements.txt verified and working
-- ⬜ settings.py connected to MySQL confirmed
-- ⬜ First migration run successfully
+- ✅ requirements.txt verified and working
+- ✅ settings.py connected to MySQL confirmed
+- ✅ First migration run successfully
 
 ---
 
 ## Phase 2 — Authentication Module
-- ⬜ Custom User model (role: student/tutor/admin)
-- ⬜ Student model created
-- ⬜ Tutor model created
-- ⬜ TutorDocument model created
-- ⬜ TutorAvailability model created
-- ⬜ All models migrated to MySQL
-- ⬜ OTP model created
-- ⬜ Student registration API — tested in Postman
-- ⬜ Tutor registration API — tested in Postman
-- ⬜ OTP send API — tested in Postman
-- ⬜ OTP verify API — tested in Postman
-- ⬜ Login API (JWT) — tested in Postman
-- ⬜ Logout API — tested in Postman
-- ⬜ Password reset via OTP — tested in Postman
+- ✅ Custom User model (role: student/tutor/admin)
+- ✅ Student model created
+- ✅ Tutor model created
+- ✅ TutorDocument model created
+- ✅ TutorAvailability model created
+- ✅ All models migrated to MySQL
+- ✅ OTP model created
+- ✅ Student registration API — tested in Postman
+- ✅ Tutor registration API — tested in Postman
+- ✅ OTP send API — tested in Postman
+- ✅ OTP verify API — tested in Postman
+- ✅ Login API (JWT) — tested in Postman
+- ✅ Logout API — tested in Postman
+- ✅ Password reset via OTP — tested in Postman
 
 ---
 
 ## Phase 3 — Tutor Discovery Module
-- ⬜ Subject model created
-- ⬜ Skill model created
-- ⬜ Tutor listing API (with filters) — tested in Postman
-- ⬜ Tutor profile API — tested in Postman
-- ⬜ Filter by domain (academic/skill/both) — tested
-- ⬜ Filter by rating — tested
-- ⬜ Filter by availability — tested
-- ⬜ Tutor availability slot API — tested in Postman
+- ✅ Subject model created
+- ✅ Skill model created
+- ✅ Tutor listing API (with filters) — tested in Postman
+- ✅ Tutor profile API — tested in Postman
+- ✅ Filter by domain (academic/skill/both) — tested
+- ✅ Filter by rating — tested
+- ✅ Filter by availability — tested
+- ✅ Tutor availability slot API — tested in Postman
 
 ---
 
 ## Phase 4 — Booking System
-- ⬜ Booking model created
+- ✅ Booking model created
 - ⬜ Session model created
-- ⬜ Create booking request API — tested in Postman
-- ⬜ Tutor accept/reject booking API — tested in Postman
-- ⬜ Booking status tracking API — tested in Postman
-- ⬜ officially_scheduled flag works correctly
-- ⬜ Student booking history API — tested in Postman
+- ✅ Create booking request API — tested in Postman
+- ✅ Tutor accept/reject booking API — tested in Postman
+- ✅ Booking status tracking API — tested in Postman
+- ✅ officially_scheduled flag works correctly
+- ✅ Student booking history API — tested in Postman
+- ✅ Tutor booking history API — tested in Postman
+- ✅ Cancel booking API — tested in Postman
 
 ---
 
@@ -150,8 +152,6 @@ Update this file yourself — don't let the agent update it.
 ---
 
 ## Current Status
-Phase: 1
-Last completed task: Project folder structure and docs set up
-Next task: Verify migrations ran successfully, then build Authentication APIscd ~/UniAssist/backend
-source ../venv/bin/activate
-python manage.py migrate
+Phase: 4
+Last completed task: Booking System Module completed and verified
+Next task: Phase 5 — Payment Module (eSewa Integration)
