@@ -2,9 +2,11 @@
 UniAssist — Root URL Configuration
 
 URL prefix mapping:
-  /admin/         → Django admin panel
-  /api/auth/      → accounts app  (registration, OTP, login, logout, password reset)
-  /api/tutors/    → tutors app    (profile setup, discovery, listing)
+  /admin/            → Django admin panel
+  /api/auth/         → accounts app  (registration, OTP, login, logout, password reset)
+  /api/tutors/       → tutors app    (profile setup, discovery, listing)
+  /api/booking/      → booking app   (request, respond, cancel, history)
+  /api/payments/     → payments app  (eSewa initiation, callback, payout)
 
 Media files are served in development only (DEBUG=True).
 """
@@ -25,6 +27,9 @@ urlpatterns = [
 
     # Booking System Module
     path('api/booking/', include('booking.urls', namespace='booking')),
+
+    # Payment Module (Phase 5)
+    path('api/payments/', include('payments.urls', namespace='payments')),
 ]
 
 # Serve media files in development

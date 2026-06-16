@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'accounts',
     'tutors',
     'booking',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -92,6 +93,10 @@ DATABASES = {
 AUTH_USER_MODEL = 'accounts.User'
 
 # ─── Password Validation ──────────────────────────────────────────────────────
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
