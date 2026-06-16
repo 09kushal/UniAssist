@@ -7,6 +7,7 @@ URL prefix mapping:
   /api/tutors/       → tutors app    (profile setup, discovery, listing)
   /api/booking/      → booking app   (request, respond, cancel, history)
   /api/payments/     → payments app  (eSewa initiation, callback, payout)
+  /api/reviews/      → reviews app   (submit review, tutor reviews, my reviews, check)
 
 Media files are served in development only (DEBUG=True).
 """
@@ -30,6 +31,9 @@ urlpatterns = [
 
     # Payment Module (Phase 5)
     path('api/payments/', include('payments.urls', namespace='payments')),
+
+    # Review & Rating Module (Phase 6)
+    path('api/reviews/', include('reviews.urls', namespace='reviews')),
 ]
 
 # Serve media files in development

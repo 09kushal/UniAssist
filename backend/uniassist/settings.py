@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'tutors',
     'booking',
     'payments',
+    'reviews',
 ]
 
 MIDDLEWARE = [
