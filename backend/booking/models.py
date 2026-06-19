@@ -121,3 +121,50 @@ class Booking(models.Model):
             f'{self.student.user.full_name} → {self.tutor.user.full_name} '
             f'[{self.booking_status}]'
         )
+
+
+class Session(models.Model):
+    """
+    Session entity representing the actual scheduled tutoring class.
+    Schema ref: DATABASE_SCHEMA.md → Session
+    """
+    class SessionStatus(models.TextChoices):
+        PENDING   = 'pending',   'Pending'
+        COMPLETED = 'completed', 'Completed'
+        CANCELLED = 'cancelled', 'Cancelled'
+
+    booking = models.ForeignKey(
+        Booking,
+        on_delete=models.CASCADE,
+        related_name='sessions',
+        help_text='The booking associated with this session.'
+    )
+    scheduled_at = models.DateTimeField(
+        help_text='The date and time when this session is scheduled to start.'
+    )
+    tutor_start_time = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='The exact time the tutor started the session.'
+    )
+    session_status = models.CharField(
+        max_length=10,
+        choices=SessionStatus.choices,
+        default=SessionStatus.PENDING,
+        help_text='Status of the session.'
+    )
+    officially_scheduled = models.BooleanField(
+        default=False,
+        help_text='Set to True only after eSewa payment is completed (Phase 5).'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'session'
+        verbose_name = 'Session'
+        verbose_name_plural = 'Sessions'
+        ordering = ['-scheduled_at']
+
+    def __str__(self):
+        return f'Session #{self.id} (Booking #{self.booking.id}) — {self.session_status}'
+
