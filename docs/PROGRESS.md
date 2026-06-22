@@ -90,15 +90,15 @@ Update this file yourself — don't let the agent update it.
 ---
 
 ## Phase 7 — Reports & Admin Module
-- ⬜ LatenessReport model created
-- ⬜ RescheduleRequest model created
+- ✅ LatenessReport model created
+- ✅ RescheduleRequest model created
 - ⬜ Student lateness report API — tested in Postman
 - ⬜ Tutor student report API — tested in Postman
 - ⬜ Admin reports panel API — tested in Postman
-- ⬜ Admin fine live preview API — tested in Postman
-- ⬜ Admin dashboard summary API — tested in Postman
-- ⬜ Tutor verification panel API — tested in Postman
-- ⬜ Admin approve/reject tutor API — tested in Postman
+- ✅ Admin fine live preview API — tested in Postman
+- ✅ Admin dashboard summary API — tested in Postman
+- ✅ Tutor verification panel API — tested in Postman
+- ✅ Admin approve/reject tutor API — tested in Postman
 
 ---
 
