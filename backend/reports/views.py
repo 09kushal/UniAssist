@@ -417,6 +417,9 @@ class AdminReportActionView(APIView):
             elif target_student:
                 target_student.warning_count += 1
                 target_student.save(update_fields=['warning_count'])
+                
+            from notifications.services import notify_warning_issued
+            notify_warning_issued(target_user, report.description)
 
         elif action == 'suspended':
             if target_tutor:
@@ -425,6 +428,9 @@ class AdminReportActionView(APIView):
             elif target_student:
                 target_student.is_suspended = True
                 target_student.save(update_fields=['is_suspended'])
+
+            from notifications.services import notify_suspension
+            notify_suspension(target_user)
 
         elif action == 'removed':
             target_user.is_active = False
@@ -550,6 +556,9 @@ class AdminFineConfirmView(APIView):
             'fine_percentage', 'fine_amount', 'fine_reason', 'fine_imposed_by',
             'student_refund', 'tutor_final_payout', 'payout_status',
         ])
+        
+        from notifications.services import notify_fine_applied
+        notify_fine_applied(payout.tutor, payout.fine_amount, payout.fine_reason)
 
         # Update any existing fined reports for this booking's sessions
         LatenessReport.objects.filter(
@@ -814,6 +823,9 @@ class AdminApproveTutorView(APIView):
         tutor.is_verified = True
         tutor.save(update_fields=['is_verified'])
 
+        from notifications.services import notify_tutor_approved
+        notify_tutor_approved(tutor)
+
         # Send approval email notification
         try:
             send_mail(
@@ -883,6 +895,9 @@ class AdminRejectTutorView(APIView):
 
         tutor.is_verified = False
         tutor.save(update_fields=['is_verified'])
+
+        from notifications.services import notify_tutor_rejected
+        notify_tutor_rejected(tutor, rejection_reason)
 
         # Send rejection email with reason
         try:

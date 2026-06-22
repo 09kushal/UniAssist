@@ -42,6 +42,9 @@ urlpatterns = [
     # Reports & Admin Module (Phase 7)
     path('api/reports/', include('reports.urls', namespace='reports')),
 
+    # Notifications Module (Phase 8)
+    path('api/notifications/', include('notifications.urls')),
+
     # Admin Dashboard Summary — exact URL from API_RULES.md:
     # GET /api/admin/dashboard/summary/
     path('api/admin/dashboard/summary/', AdminDashboardSummaryView.as_view(), name='admin-dashboard-summary'),

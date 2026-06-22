@@ -36,4 +36,7 @@ urlpatterns = [
     # Password Reset
     path('password-reset/request/', views.PasswordResetRequestView.as_view(), name='password-reset-request'),
     path('password-reset/confirm/', views.PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
+
+    # Device Token
+    path('device-token/', __import__('notifications.views').views.DeviceTokenUpdateView.as_view(), name='device-token'),
 ]

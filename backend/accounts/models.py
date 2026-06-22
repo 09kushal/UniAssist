@@ -63,6 +63,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     full_name  = models.CharField(max_length=255)
     email      = models.EmailField(unique=True)
+    device_token = models.CharField(max_length=255, blank=True, null=True)
     # password is handled by AbstractBaseUser
     role       = models.CharField(
         max_length=10,

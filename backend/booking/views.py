@@ -201,6 +201,13 @@ class BookingRespondView(APIView):
 
         booking.save()
 
+        if action == 'accept':
+            from notifications.services import notify_booking_accepted
+            notify_booking_accepted(booking)
+        elif action == 'reject':
+            from notifications.services import notify_booking_rejected
+            notify_booking_rejected(booking)
+
         resp_serializer = BookingSerializer(booking, context={'request': request})
         return success_response(
             message=f'Booking successfully {booking.booking_status}.',

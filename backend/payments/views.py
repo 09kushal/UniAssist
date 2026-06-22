@@ -350,6 +350,9 @@ class PaymentCallbackView(APIView):
                 booking.officially_scheduled = True
                 booking.save(update_fields=['officially_scheduled'])
 
+                from notifications.services import notify_payment_confirmed
+                notify_payment_confirmed(booking)
+
                 logger.info(
                     'Payment #%s completed. Booking #%s officially scheduled.',
                     payment.id, booking.id,
@@ -615,6 +618,9 @@ class AdminPayoutReleaseView(APIView):
             released_by         = user,
             released_at         = timezone.now(),
         )
+
+        from notifications.services import notify_payout_released
+        notify_payout_released(payout)
 
         logger.info(
             'Admin %s released payout #%s for booking #%s. '
