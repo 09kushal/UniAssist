@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "240184195523",
+    "project_id": "uniassist-71267",
+    "storage_bucket": "uniassist-71267.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:240184195523:android:822d72239a841b9a2ce576",
+        "android_client_info": {
+          "package_name": "com.kushal.uniassist"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBU4DshDARywJJ2U3XHlUtQg2q-1HBQqc0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
