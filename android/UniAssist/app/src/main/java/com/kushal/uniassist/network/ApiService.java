@@ -9,6 +9,7 @@ import com.kushal.uniassist.models.RegisterRequest;
 import com.kushal.uniassist.models.RegisterResponse;
 import com.kushal.uniassist.models.OtpVerifyRequest;
 import com.kushal.uniassist.models.OtpVerifyResponse;
+import com.kushal.uniassist.models.TutorRegisterRequest;
 
 public interface ApiService {
 
@@ -17,6 +18,9 @@ public interface ApiService {
 
     @POST("api/auth/register/student/")
     Call<RegisterResponse> registerStudent(@Body RegisterRequest request);
+
+    @POST("api/auth/register/tutor/")
+    Call<RegisterResponse> registerTutor(@Body TutorRegisterRequest request);
 
     @POST("api/auth/verify-otp/")
     Call<OtpVerifyResponse> verifyOtp(@Body OtpVerifyRequest request);

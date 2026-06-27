@@ -18,6 +18,9 @@
             android:name=".OtpVerifyActivity"
             android:exported="false" />
         <activity
+            android:name=".TutorRegisterActivity"
+            android:exported="false" />
+        <activity
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity

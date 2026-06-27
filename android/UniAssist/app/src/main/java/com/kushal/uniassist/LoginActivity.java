@@ -24,7 +24,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
     private Button btnLogin;
-    private TextView tvGoToRegister;
+    private TextView tvGoToRegister, tvGoToTutorRegister;
     private ProgressBar progressBar;
 
     @Override
@@ -37,10 +37,14 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         progressBar = findViewById(R.id.progressBar);
         tvGoToRegister = findViewById(R.id.tvGoToRegister);
+        tvGoToTutorRegister = findViewById(R.id.tvGoToTutorRegister);
 
         btnLogin.setOnClickListener(v -> attemptLogin());
         tvGoToRegister.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+        });
+        tvGoToTutorRegister.setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this, TutorRegisterActivity.class));
         });
     }
 
