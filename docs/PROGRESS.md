@@ -125,7 +125,7 @@ Update this file yourself — don't let the agent update it.
 - ⬜ Profile Setup Screen
 - ⬜ Student Dashboard
 - ⬜ Tutor Listing Screen
-- ⬜ Tutor Profile Screen
+- ⬜ "Tutor Edit Profile Screen" (optional, accessed from Tutor Dashboard, not forced after registration)
 - ⬜ Booking Request Screen
 - ⬜ Payment Screen (eSewa)
 - ⬜ Live Class Screen (Jitsi Meet)

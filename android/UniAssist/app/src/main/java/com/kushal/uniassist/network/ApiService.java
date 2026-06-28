@@ -10,6 +10,13 @@ import com.kushal.uniassist.models.RegisterResponse;
 import com.kushal.uniassist.models.OtpVerifyRequest;
 import com.kushal.uniassist.models.OtpVerifyResponse;
 import com.kushal.uniassist.models.TutorRegisterRequest;
+import com.kushal.uniassist.models.StudentProfileResponse;
+
+import okhttp3.RequestBody;
+import retrofit2.http.Header;
+import retrofit2.http.Multipart;
+import retrofit2.http.PATCH;
+import retrofit2.http.Part;
 
 public interface ApiService {
 
@@ -24,4 +31,12 @@ public interface ApiService {
 
     @POST("api/auth/verify-otp/")
     Call<OtpVerifyResponse> verifyOtp(@Body OtpVerifyRequest request);
+
+    @Multipart
+    @PATCH("api/auth/student/profile/setup/")
+    Call<StudentProfileResponse> updateStudentProfile(
+            @Header("Authorization") String authHeader,
+            @Part("grade_or_university") RequestBody gradeOrUniversity,
+            @Part("subjects_of_interest") RequestBody subjectsOfInterest
+    );
 }

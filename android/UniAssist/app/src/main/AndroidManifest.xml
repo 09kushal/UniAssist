@@ -27,6 +27,9 @@
             android:name=".TutorDashboardActivity"
             android:exported="false" />
         <activity
+            android:name=".EditProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".StudentDashboardActivity"
             android:exported="false" />
         <activity

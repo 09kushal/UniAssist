@@ -48,6 +48,7 @@ from .serializers import (
     StudentRegisterSerializer,
     TutorRegisterSerializer,
     ResendOTPSerializer,
+    StudentProfileSetupSerializer,
 )
 from uniassist.utils import error_response, success_response
 
@@ -558,4 +559,70 @@ class ResendOTPView(APIView):
         return success_response(
             message='A new OTP has been sent to your email.',
             data={'email': email},
+        )
+
+
+# ─── 9. Student Profile Setup ─────────────────────────────────────────────────
+
+class StudentProfileSetupView(APIView):
+    """
+    PATCH /api/auth/student/profile/setup/
+    Auth: Student JWT required.
+
+    Partial update of grade_or_university, subjects_of_interest, and/or profile_photo.
+    Supports multipart/form-data for file uploads.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        if not request.user.is_authenticated or not request.user.is_student:
+            return error_response(
+                message='Only students can access this endpoint.',
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        try:
+            student = request.user.student_profile
+        except Exception:
+            return error_response(
+                message='Student profile not found.',
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = StudentProfileSetupSerializer(data=request.data)
+        if not serializer.is_valid():
+            first_error = next(iter(serializer.errors.values()))[0]
+            return error_response(
+                message=str(first_error),
+                errors=serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        data = serializer.validated_data
+
+        if 'grade_or_university' in data:
+            student.grade_or_university = data['grade_or_university']
+        if 'subjects_of_interest' in data:
+            student.subjects_of_interest = data['subjects_of_interest']
+        if 'profile_photo' in data and data['profile_photo'] is not None:
+            student.profile_photo = data['profile_photo']
+
+        student.save()
+
+        profile_photo_url = None
+        if student.profile_photo:
+            try:
+                profile_photo_url = request.build_absolute_uri(student.profile_photo.url)
+            except Exception:
+                pass
+
+        return success_response(
+            message='Profile updated successfully.',
+            data={
+                'id': student.id,
+                'full_name': student.user.full_name,
+                'grade_or_university': student.grade_or_university,
+                'subjects_of_interest': student.subjects_of_interest,
+                'profile_photo_url': profile_photo_url,
+            },
         )

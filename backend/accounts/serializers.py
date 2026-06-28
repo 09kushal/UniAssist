@@ -18,6 +18,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
+from tutors.serializers import validate_profile_photo
 from .models import User, Tutor
 
 
@@ -185,3 +186,25 @@ class ResendOTPSerializer(serializers.Serializer):
     def validate_email(self, value):
         return value.lower().strip()
 
+
+# ─── Student Profile Setup ────────────────────────────────────────────────────
+
+class StudentProfileSetupSerializer(serializers.Serializer):
+    """
+    PATCH /api/auth/student/profile/setup/
+    All fields are optional (partial update).
+    """
+    grade_or_university  = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=255,
+    )
+    subjects_of_interest = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=500,
+    )
+    profile_photo        = serializers.ImageField(required=False, allow_null=True)
+
+    def validate_profile_photo(self, image):
+        return validate_profile_photo(image)
