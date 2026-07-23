@@ -1,0 +1,287 @@
+package com.kushal.uniassist;
+
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.chip.ChipGroup;
+import com.kushal.uniassist.models.ApiResponse;
+import com.kushal.uniassist.models.PaginatedResponse;
+import com.kushal.uniassist.models.TutorResponse;
+import com.kushal.uniassist.network.ApiClient;
+import com.kushal.uniassist.network.ApiService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class TutorListActivity extends AppCompatActivity {
+
+    private static final String TAG = "TutorList";
+    private static final int PAGE_SIZE = 10;
+    private RecyclerView rvTutors;
+    private TutorAdapter adapter;
+    private List<TutorResponse> allTutors = new ArrayList<>();
+    private List<TutorResponse> filteredTutors = new ArrayList<>();
+    private ProgressBar progressBar;
+    private TextView tvEmpty;
+    private ChipGroup chipGroupFilters;
+    private EditText etSearch;
+    private ImageView ivBack;
+    private SessionManager sessionManager;
+    
+    private int currentPage = 1;
+    private int totalPages = 1;
+    private boolean isLoading = false;
+    private boolean isLastPage = false;
+    private String currentDomain = "";
+    private String searchQuery = "";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        try {
+            setContentView(R.layout.activity_tutor_list);
+
+            // Edge-to-edge & Status Bar Fix
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.setStatusBarColor(ContextCompat.getColor(this, R.color.primary));
+            }
+            WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                return insets;
+            });
+
+            if (sessionManager == null) {
+                sessionManager = new SessionManager(this);
+            }
+            
+            rvTutors = findViewById(R.id.rvTutors);
+            progressBar = findViewById(R.id.progressBar);
+            tvEmpty = findViewById(R.id.tvEmpty);
+            chipGroupFilters = findViewById(R.id.chipGroupFilters);
+            etSearch = findViewById(R.id.etSearch);
+            ivBack = findViewById(R.id.ivBack);
+
+            if (ivBack != null) ivBack.setOnClickListener(v -> finish());
+
+            String domainExtra = getIntent().getStringExtra("domain");
+            if (domainExtra != null) {
+                currentDomain = domainExtra;
+            }
+
+            adapter = new TutorAdapter(new TutorAdapter.OnTutorClickListener() {
+                @Override
+                public void onTutorClick(TutorResponse tutor) {
+                    Intent intent = new Intent(TutorListActivity.this, TutorProfileActivity.class);
+                    intent.putExtra("tutor_id", tutor.getId());
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onBookNowClick(TutorResponse tutor) {
+                    Intent intent = new Intent(TutorListActivity.this, TutorProfileActivity.class);
+                    intent.putExtra("tutor_id", tutor.getId());
+                    startActivity(intent);
+                }
+            });
+
+            if (rvTutors != null) {
+                rvTutors.setLayoutManager(new LinearLayoutManager(this));
+                rvTutors.setAdapter(adapter);
+
+                rvTutors.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                        super.onScrolled(recyclerView, dx, dy);
+                        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                        if (layoutManager != null && !isLoading && !isLastPage && (currentDomain == null || currentDomain.isEmpty()) && searchQuery.isEmpty()) {
+                            if (allTutors.isEmpty()) return;
+                            if (layoutManager.findLastCompletelyVisibleItemPosition() == allTutors.size() - 1) {
+                                loadTutors(false);
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (chipGroupFilters != null) {
+                chipGroupFilters.setOnCheckedStateChangeListener((group, checkedIds) -> {
+                    if (checkedIds.isEmpty()) return;
+                    int checkedId = checkedIds.get(0);
+                    if (checkedId == R.id.chipAll) {
+                        currentDomain = "";
+                    } else if (checkedId == R.id.chipAcademic) {
+                        currentDomain = "academic";
+                    } else if (checkedId == R.id.chipSkill) {
+                        currentDomain = "skill";
+                    }
+                    loadTutors(true);
+                });
+            }
+
+            if (etSearch != null) {
+                etSearch.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        searchQuery = s.toString().toLowerCase().trim();
+                        filterLocally();
+                    }
+                    @Override
+                    public void afterTextChanged(Editable s) {}
+                });
+            }
+
+            loadTutors(true);
+        } catch (Exception e) {
+            Log.e(TAG, "onCreate error: " + e.getMessage());
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
+    private void filterLocally() {
+        if (searchQuery.isEmpty()) {
+            filteredTutors.clear();
+            filteredTutors.addAll(allTutors);
+        } else {
+            filteredTutors.clear();
+            List<TutorResponse> filtered = allTutors.stream()
+                    .filter(t -> (t.getFullName() != null && t.getFullName().toLowerCase().contains(searchQuery)) || 
+                            (t.getSubjects() != null && t.getSubjects().stream().anyMatch(s -> s.getName() != null && s.getName().toLowerCase().contains(searchQuery))) ||
+                            (t.getSkills() != null && t.getSkills().stream().anyMatch(s -> s.getName() != null && s.getName().toLowerCase().contains(searchQuery))))
+                    .collect(Collectors.toList());
+            filteredTutors.addAll(filtered);
+        }
+        if (adapter != null) adapter.updateList(filteredTutors);
+        if (tvEmpty != null) tvEmpty.setVisibility(filteredTutors.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    private void loadTutors(boolean refresh) {
+        if (sessionManager.getAccessToken() == null) {
+            redirectToLogin();
+            return;
+        }
+
+        if (refresh) {
+            currentPage = 1;
+            isLastPage = false;
+        }
+
+        isLoading = true;
+        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+        if (refresh && tvEmpty != null) {
+            tvEmpty.setVisibility(View.GONE);
+        }
+
+        try {
+            ApiService apiService = ApiClient.getClient().create(ApiService.class);
+            String authHeader = "Bearer " + sessionManager.getAccessToken();
+            
+            Log.d(TAG, "Token: " + authHeader);
+            String domainParam = currentDomain.isEmpty() ? null : currentDomain;
+            Log.d(TAG, "Loading tutors... domain=" + domainParam + ", page=" + currentPage);
+
+            apiService.getTutorList(authHeader, domainParam, currentPage).enqueue(new Callback<ApiResponse<PaginatedResponse<TutorResponse>>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<PaginatedResponse<TutorResponse>>> call, Response<ApiResponse<PaginatedResponse<TutorResponse>>> response) {
+                    isLoading = false;
+                    if (progressBar != null) progressBar.setVisibility(View.GONE);
+
+                    if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                        PaginatedResponse<TutorResponse> paginatedData = response.body().getData();
+                        List<TutorResponse> tutors = paginatedData.getResults();
+                        
+                        if (refresh) {
+                            allTutors.clear();
+                        }
+                        
+                        if (tutors != null && !tutors.isEmpty()) {
+                            allTutors.addAll(tutors);
+                            currentPage++;
+                            
+                            if (tvEmpty != null) tvEmpty.setVisibility(View.GONE);
+                            if (rvTutors != null) rvTutors.setVisibility(View.VISIBLE);
+                            filterLocally();
+                        } else {
+                            if (refresh) {
+                                if (tvEmpty != null) {
+                                    tvEmpty.setVisibility(View.VISIBLE);
+                                    tvEmpty.setText("No tutors found");
+                                }
+                                if (rvTutors != null) rvTutors.setVisibility(View.GONE);
+                            }
+                            isLastPage = true;
+                        }
+
+                        totalPages = (int) Math.ceil((double) paginatedData.getCount() / PAGE_SIZE);
+
+                    } else if (response.code() == 401) {
+                        redirectToLogin();
+                    } else {
+                        String error = "Unknown error";
+                        try {
+                            if (response.errorBody() != null) {
+                                error = response.errorBody().string();
+                                Log.e(TAG, "Error body: " + error);
+                            }
+                        } catch (Exception ignored) {}
+                        Toast.makeText(TutorListActivity.this, "Failed to load tutors", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<PaginatedResponse<TutorResponse>>> call, Throwable t) {
+                    isLoading = false;
+                    if (progressBar != null) progressBar.setVisibility(View.GONE);
+                    Log.e(TAG, "Network error: " + t.getMessage());
+                    Toast.makeText(TutorListActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+        } catch (Exception e) {
+            isLoading = false;
+            if (progressBar != null) progressBar.setVisibility(View.GONE);
+            Log.e(TAG, "Catch error: " + e.getMessage());
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void redirectToLogin() {
+        if (sessionManager != null) sessionManager.clearSession();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+}

@@ -29,7 +29,9 @@ public class SessionManager {
     }
 
     public String getAccessToken() {
-        return prefs.getString(KEY_ACCESS_TOKEN, null);
+        String token = prefs.getString(KEY_ACCESS_TOKEN, null);
+        android.util.Log.d("SessionManager", "Getting token: " + (token != null ? "exists, length=" + token.length() : "NULL"));
+        return token;
     }
 
     public String getRefreshToken() {

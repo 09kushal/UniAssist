@@ -7,7 +7,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
 
-    private static final String BASE_URL = "http://192.168.254.7:8000/";
+    // BASE_URL is http://127.0.0.1:8000/ because adb reverse tcp:8000 tcp:8000 is being used
+    private static final String BASE_URL = "http://127.0.0.1:8000/";
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient() {

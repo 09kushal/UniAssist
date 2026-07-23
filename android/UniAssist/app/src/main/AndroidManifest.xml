@@ -15,6 +15,33 @@
         android:theme="@style/Theme.UniAssist"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".NotificationsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BookingRequestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TutorProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TutorListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TutorReportsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PayoutActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TutorEditProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TutorBookingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".OtpVerifyActivity"
             android:exported="false" />
         <activity
@@ -33,7 +60,7 @@
             android:name=".StudentDashboardActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,6 +68,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />
