@@ -85,7 +85,14 @@ public class MyBookingsActivity extends AppCompatActivity {
 
             @Override
             public void onJoin(BookingResponse booking) {
-                Toast.makeText(MyBookingsActivity.this, "Joining session...", Toast.LENGTH_SHORT).show();
+                String userName = sessionManager.getFullName();
+                if (userName == null) userName = "Student";
+
+                Intent intent = new Intent(MyBookingsActivity.this, JoinSessionActivity.class);
+                intent.putExtra("booking_id", booking.getId());
+                intent.putExtra("user_full_name", userName);
+                intent.putExtra("user_role", "student");
+                startActivity(intent);
             }
         });
         rvBookings.setAdapter(bookingDetailAdapter);

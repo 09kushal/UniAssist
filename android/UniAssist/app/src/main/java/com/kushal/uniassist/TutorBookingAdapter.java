@@ -23,6 +23,7 @@ public class TutorBookingAdapter extends RecyclerView.Adapter<TutorBookingAdapte
     public interface OnBookingActionListener {
         void onAccept(BookingResponse booking);
         void onReject(BookingResponse booking);
+        void onJoin(BookingResponse booking);
     }
 
     public TutorBookingAdapter(OnBookingActionListener listener) {
@@ -59,7 +60,7 @@ public class TutorBookingAdapter extends RecyclerView.Adapter<TutorBookingAdapte
     static class BookingViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvStudentName, tvStatus, tvSubject, tvDateTime, tvMessage;
         private final LinearLayout layoutActions;
-        private final MaterialButton btnAccept, btnReject;
+        private final MaterialButton btnAccept, btnReject, btnJoin;
 
         public BookingViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -71,6 +72,7 @@ public class TutorBookingAdapter extends RecyclerView.Adapter<TutorBookingAdapte
             layoutActions = itemView.findViewById(R.id.layoutActions);
             btnAccept = itemView.findViewById(R.id.btnAccept);
             btnReject = itemView.findViewById(R.id.btnReject);
+            btnJoin = itemView.findViewById(R.id.btnJoin);
         }
 
         public void bind(BookingResponse booking, OnBookingActionListener listener) {
@@ -88,12 +90,18 @@ public class TutorBookingAdapter extends RecyclerView.Adapter<TutorBookingAdapte
             String status = booking.getBookingStatus();
             if ("pending".equalsIgnoreCase(status)) {
                 layoutActions.setVisibility(View.VISIBLE);
+                btnJoin.setVisibility(View.GONE);
+            } else if ("accepted".equalsIgnoreCase(status)) {
+                layoutActions.setVisibility(View.GONE);
+                btnJoin.setVisibility(View.VISIBLE);
             } else {
                 layoutActions.setVisibility(View.GONE);
+                btnJoin.setVisibility(View.GONE);
             }
 
             btnAccept.setOnClickListener(v -> listener.onAccept(booking));
             btnReject.setOnClickListener(v -> listener.onReject(booking));
+            btnJoin.setOnClickListener(v -> listener.onJoin(booking));
         }
     }
 }
