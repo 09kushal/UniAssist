@@ -3,6 +3,7 @@ package com.kushal.uniassist;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -20,6 +21,8 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+import com.kushal.uniassist.models.ApiResponse;
 import com.kushal.uniassist.models.TutorResponse;
 import com.kushal.uniassist.network.ApiClient;
 import com.kushal.uniassist.network.ApiService;
@@ -38,6 +41,7 @@ public class TutorDashboardActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e("TutorDash", "=== DASHBOARD CREATED ===");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tutor_dashboard);
 
@@ -69,13 +73,6 @@ public class TutorDashboardActivity extends AppCompatActivity {
         cardReports = findViewById(R.id.cardReports);
         btnLogout = findViewById(R.id.btnLogout);
 
-        String fullName = sessionManager.getFullName();
-        if (fullName != null && tvWelcome != null) {
-            tvWelcome.setText(fullName);
-        }
-
-        fetchTutorProfile();
-
         cardBookings.setOnClickListener(v -> startActivity(new Intent(this, TutorBookingsActivity.class)));
         cardProfile.setOnClickListener(v -> startActivity(new Intent(this, TutorEditProfileActivity.class)));
         cardPayouts.setOnClickListener(v -> startActivity(new Intent(this, PayoutActivity.class)));
@@ -90,30 +87,78 @@ public class TutorDashboardActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchTutorProfile() {
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        String authHeader = "Bearer " + sessionManager.getAccessToken();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchTutorProfile();
+    }
 
-        apiService.getMyTutorProfile(authHeader).enqueue(new Callback<TutorResponse>() {
+    private void fetchTutorProfile() {
+        Log.e("TutorDash", "=== FETCHING PROFILE ===");
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        String token = sessionManager.getAccessToken();
+        Log.e("TutorDash", "Token null: " + (token == null));
+        Log.e("TutorDash", "Token length: " + (token != null ? token.length() : 0));
+        
+        String authHeader = "Bearer " + token;
+        Log.e("TutorDash", "Calling my-profile API...");
+
+        apiService.getMyTutorProfile(authHeader).enqueue(new Callback<ApiResponse<TutorResponse>>() {
             @Override
-            public void onResponse(Call<TutorResponse> call, Response<TutorResponse> response) {
+            public void onResponse(Call<ApiResponse<TutorResponse>> call, Response<ApiResponse<TutorResponse>> response) {
+                Log.e("TutorDash", "=== GOT RESPONSE ===");
+                Log.e("TutorDash", "Code: " + response.code());
+                Log.e("TutorDash", "Body null: " + (response.body() == null));
+
                 if (response.isSuccessful() && response.body() != null) {
-                    displayTutorData(response.body());
+                    // Log raw JSON response
+                    String rawJson = new Gson().toJson(response.body());
+                    Log.d("TutorDash", "RAW RESPONSE: " + rawJson);
+
+                    TutorResponse profile = response.body().getData();
+
+                    if (profile != null) {
+                        Log.d("TutorDash", "is_verified: " + profile.isVerified());
+                        Log.d("TutorDash", "is_verified_badge: " + profile.isVerifiedBadge());
+                        Log.d("TutorDash", "full_name: " + profile.getFullName());
+                        displayTutorData(profile);
+                    } else {
+                        Log.e("TutorDash", "Profile (data) is NULL!");
+                    }
                 } else if (response.code() == 401) {
                     redirectToLogin();
+                } else {
+                    Log.e("TutorDash", "Response failed: " + response.code());
+                    try {
+                        if (response.errorBody() != null) {
+                            Log.e("TutorDash", "Error: " + response.errorBody().string());
+                        }
+                    } catch (Exception e) {
+                        Log.e("TutorDash", e.getMessage());
+                    }
                 }
             }
 
             @Override
-            public void onFailure(Call<TutorResponse> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<TutorResponse>> call, Throwable t) {
+                Log.e("TutorDash", "=== FAILURE ===");
+                Log.e("TutorDash", "Error: " + t.getMessage());
                 Toast.makeText(TutorDashboardActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void displayTutorData(TutorResponse tutor) {
+        Log.d("TutorDash", "is_verified_badge: " + tutor.isVerifiedBadge());
+        Log.d("TutorDash", "is_verified: " + tutor.isVerified());
+        Log.d("TutorDash", "Full response: " + new Gson().toJson(tutor));
+
+        if (tvWelcome != null) {
+            tvWelcome.setText("Welcome back,\n" + tutor.getFullName());
+        }
+
         if (tvVerificationStatus != null) {
-            if (tutor.isVerified()) {
+            if (tutor.isVerifiedBadge() || tutor.isVerified()) {
                 tvVerificationStatus.setText("✓ Verified");
                 tvVerificationStatus.setBackgroundResource(R.drawable.bg_verified_badge);
             } else {
@@ -123,7 +168,9 @@ public class TutorDashboardActivity extends AppCompatActivity {
         }
 
         if (tvTotalSessions != null) tvTotalSessions.setText(String.valueOf(tutor.getTotalSessionsDone()));
-        if (tvTutorRating != null) tvTutorRating.setText(tutor.getAverageRating());
+        if (tvTutorRating != null) {
+            tvTutorRating.setText(String.format(java.util.Locale.US, "%.1f", tutor.getAverageRatingFloat()));
+        }
         
         try {
             double price = Double.parseDouble(tutor.getPricingPerSession());

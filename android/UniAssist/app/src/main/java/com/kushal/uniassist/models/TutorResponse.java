@@ -38,6 +38,9 @@ public class TutorResponse {
     @SerializedName("is_verified_badge")
     private boolean isVerifiedBadge = false;
 
+    @SerializedName("is_verified")
+    private boolean isVerified = false;
+
     @SerializedName("subjects")
     private List<SubjectResponse> subjects;
 

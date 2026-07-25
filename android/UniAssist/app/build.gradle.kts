@@ -52,6 +52,7 @@ dependencies {
 
     // SharedPreferences for token storage (basic, we'll secure it later)
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)

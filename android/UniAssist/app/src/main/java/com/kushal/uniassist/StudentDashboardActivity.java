@@ -149,7 +149,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
         });
         
         cardMyBookings.setOnClickListener(v -> {
-            Toast.makeText(this, "My Bookings - Coming Soon", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, MyBookingsActivity.class));
         });
 
         cardNotifications.setOnClickListener(v -> {
@@ -201,11 +201,11 @@ public class StudentDashboardActivity extends AppCompatActivity {
         });
 
         // 3. Booking Stats
-        apiService.getMyBookings(authHeader).enqueue(new Callback<ApiResponse<List<BookingResponse>>>() {
+        apiService.getMyBookings(authHeader, 1).enqueue(new Callback<ApiResponse<PaginatedResponse<BookingResponse>>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<BookingResponse>>> call, Response<ApiResponse<List<BookingResponse>>> response) {
+            public void onResponse(Call<ApiResponse<PaginatedResponse<BookingResponse>>> call, Response<ApiResponse<PaginatedResponse<BookingResponse>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
-                    List<BookingResponse> bookings = response.body().getData();
+                    List<BookingResponse> bookings = response.body().getData().getResults();
                     tvBookingCount.setText(String.valueOf(bookings.size()));
                     
                     int done = 0;
@@ -230,7 +230,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
                 }
             }
             @Override
-            public void onFailure(Call<ApiResponse<List<BookingResponse>>> call, Throwable t) {}
+            public void onFailure(Call<ApiResponse<PaginatedResponse<BookingResponse>>> call, Throwable t) {}
         });
     }
 

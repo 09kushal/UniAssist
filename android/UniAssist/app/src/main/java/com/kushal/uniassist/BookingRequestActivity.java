@@ -44,7 +44,7 @@ public class BookingRequestActivity extends AppCompatActivity {
 
     private EditText etSubjectOrSkill, etMessage;
     private TextView tvTutorName, tvPriceLabel, tvSelectedDate, tvStartTime, tvEndTime;
-    private ImageView ivTutorPhoto, ivBack;
+    private ImageView ivBack;
     private LinearLayout llSelectDate, llSelectStartTime, llSelectEndTime;
     private Button btnSendRequest;
     private ProgressBar progressBar;
@@ -83,7 +83,6 @@ public class BookingRequestActivity extends AppCompatActivity {
         }
 
         ivBack = findViewById(R.id.ivBack);
-        ivTutorPhoto = findViewById(R.id.ivTutorPhoto);
         tvTutorName = findViewById(R.id.tvTutorName);
         tvPriceLabel = findViewById(R.id.tvPriceLabel);
         
@@ -105,33 +104,36 @@ public class BookingRequestActivity extends AppCompatActivity {
         if (llSelectEndTime != null) llSelectEndTime.setOnClickListener(v -> showTimePicker(false));
         if (btnSendRequest != null) btnSendRequest.setOnClickListener(v -> sendBookingRequest());
 
-        fetchTutorMinimal();
+        setupTutorInfo();
     }
 
-    private void fetchTutorMinimal() {
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        String authHeader = "Bearer " + sessionManager.getAccessToken();
+    private void setupTutorInfo() {
+        String tutorName = getIntent().getStringExtra("tutor_name");
+        String tutorPrice = getIntent().getStringExtra("tutor_price");
 
-        apiService.getTutorProfile(authHeader, tutorId).enqueue(new Callback<TutorResponse>() {
-            @Override
-            public void onResponse(Call<TutorResponse> call, Response<TutorResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    TutorResponse tutor = response.body();
-                    if (tvTutorName != null) tvTutorName.setText(tutor.getFullName());
-                    if (tvPriceLabel != null) tvPriceLabel.setText("NPR " + tutor.getPricingPerSession() + "/session");
-                    if (ivTutorPhoto != null) {
-                        Glide.with(BookingRequestActivity.this)
-                                .load(tutor.getProfilePhotoUrl())
-                                .circleCrop()
-                                .placeholder(R.drawable.ic_tutor_placeholder)
-                                .into(ivTutorPhoto);
-                    }
-                }
+        Log.d("BookingDebug", "Tutor name: " + tutorName);
+        Log.d("BookingDebug", "Tutor price: " + tutorPrice);
+
+        if (tvTutorName != null) {
+            if (tutorName != null && !tutorName.isEmpty()) {
+                tvTutorName.setText(tutorName);
+            } else {
+                tvTutorName.setText("Tutor");
             }
-
-            @Override
-            public void onFailure(Call<TutorResponse> call, Throwable t) {}
-        });
+        }
+        
+        if (tvPriceLabel != null) {
+            if (tutorPrice != null && 
+                !tutorPrice.isEmpty() && 
+                !tutorPrice.equals("0.00") &&
+                !tutorPrice.equals("0")) {
+                tvPriceLabel.setText("NPR " + tutorPrice + " per session");
+                tvPriceLabel.setVisibility(View.VISIBLE);
+            } else {
+                tvPriceLabel.setText("Free / Price not set by tutor");
+                tvPriceLabel.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     private void showDatePicker() {
@@ -144,7 +146,11 @@ public class BookingRequestActivity extends AppCompatActivity {
             selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year1, month1 + 1, dayOfMonth);
             if (tvSelectedDate != null) tvSelectedDate.setText(selectedDate);
         }, year, month, day);
-        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
+        
+        Calendar tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DAY_OF_MONTH, 1);
+        datePickerDialog.getDatePicker().setMinDate(tomorrow.getTimeInMillis());
+        
         datePickerDialog.show();
     }
 
@@ -176,6 +182,43 @@ public class BookingRequestActivity extends AppCompatActivity {
             return;
         }
 
+        // Time Validation
+        try {
+            String[] dateParts = selectedDate.split("-");
+            int year = Integer.parseInt(dateParts[0]);
+            int month = Integer.parseInt(dateParts[1]) - 1;
+            int day = Integer.parseInt(dateParts[2]);
+
+            String[] startParts = selectedStartTime.split(":");
+            int startHour = Integer.parseInt(startParts[0]);
+            int startMin = Integer.parseInt(startParts[1]);
+
+            String[] endParts = selectedEndTime.split(":");
+            int endHour = Integer.parseInt(endParts[0]);
+            int endMin = Integer.parseInt(endParts[1]);
+
+            Calendar now = Calendar.getInstance();
+            Calendar startCal = Calendar.getInstance();
+            startCal.set(year, month, day, startHour, startMin, 0);
+            startCal.set(Calendar.MILLISECOND, 0);
+
+            if (startCal.before(now)) {
+                Toast.makeText(this, "Please select a future time", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Calendar endCal = Calendar.getInstance();
+            endCal.set(year, month, day, endHour, endMin, 0);
+            endCal.set(Calendar.MILLISECOND, 0);
+
+            if (!endCal.after(startCal)) {
+                Toast.makeText(this, "End time must be after start time", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } catch (Exception e) {
+            Log.e("BookingDebug", "Validation error: " + e.getMessage());
+        }
+
         if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
         if (btnSendRequest != null) btnSendRequest.setEnabled(false);
 
@@ -193,13 +236,14 @@ public class BookingRequestActivity extends AppCompatActivity {
             }
             String token = "Bearer " + accessToken;
 
-            Log.d("BookingDebug", "Token being sent: " + token);
-            Log.d("BookingDebug", "Token length: " + token.length());
-            Log.d("Booking", "Tutor ID: " + tutorId);
-            Log.d("Booking", "Subject: " + subjectOrSkill);
-            Log.d("Booking", "Date: " + selectedDate);
-            Log.d("Booking", "Start: " + selectedStartTime);
-            Log.d("Booking", "End: " + selectedEndTime);
+            Log.d("BookingDebug", "=== BOOKING REQUEST ===");
+            Log.d("BookingDebug", "Tutor ID: " + tutorId);
+            Log.d("BookingDebug", "Subject: " + subjectOrSkill);
+            Log.d("BookingDebug", "Date: " + selectedDate);
+            Log.d("BookingDebug", "Start: " + selectedStartTime);
+            Log.d("BookingDebug", "End: " + selectedEndTime);
+            Log.d("BookingDebug", "Message: " + message);
+            Log.d("BookingDebug", "Token exists: " + (sessionManager.getAccessToken() != null));
 
             ApiService apiService = ApiClient.getClient().create(ApiService.class);
 
@@ -229,11 +273,12 @@ public class BookingRequestActivity extends AppCompatActivity {
                         }
                     } else {
                         try {
-                            String errorBody = response.errorBody() != null ? response.errorBody().string() : "Unknown error";
-                            Log.e("Booking", "Error body: " + errorBody);
-                            Toast.makeText(BookingRequestActivity.this, "Failed: " + errorBody, Toast.LENGTH_LONG).show();
+                            String errorBody = response.errorBody() != null ? response.errorBody().string() : "null";
+                            Log.e("BookingDebug", "Error code: " + response.code());
+                            Log.e("BookingDebug", "Error body: " + errorBody);
+                            Toast.makeText(BookingRequestActivity.this, "Error: " + errorBody, Toast.LENGTH_LONG).show();
                         } catch (Exception e) {
-                            Log.e("Booking", e.getMessage());
+                            Log.e("BookingDebug", "Parse error: " + e.getMessage());
                         }
                     }
                 }

@@ -104,6 +104,9 @@ public class TutorListActivity extends AppCompatActivity {
                 public void onTutorClick(TutorResponse tutor) {
                     Intent intent = new Intent(TutorListActivity.this, TutorProfileActivity.class);
                     intent.putExtra("tutor_id", tutor.getId());
+                    intent.putExtra("tutor_name", tutor.getFullName());
+                    intent.putExtra("tutor_price", tutor.getPricingPerSession());
+                    intent.putExtra("tutor_domain", tutor.getDomain());
                     startActivity(intent);
                 }
 
@@ -111,6 +114,9 @@ public class TutorListActivity extends AppCompatActivity {
                 public void onBookNowClick(TutorResponse tutor) {
                     Intent intent = new Intent(TutorListActivity.this, TutorProfileActivity.class);
                     intent.putExtra("tutor_id", tutor.getId());
+                    intent.putExtra("tutor_name", tutor.getFullName());
+                    intent.putExtra("tutor_price", tutor.getPricingPerSession());
+                    intent.putExtra("tutor_domain", tutor.getDomain());
                     startActivity(intent);
                 }
             });
@@ -123,11 +129,17 @@ public class TutorListActivity extends AppCompatActivity {
                     @Override
                     public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                         super.onScrolled(recyclerView, dx, dy);
-                        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                        if (layoutManager != null && !isLoading && !isLastPage && (currentDomain == null || currentDomain.isEmpty()) && searchQuery.isEmpty()) {
-                            if (allTutors.isEmpty()) return;
-                            if (layoutManager.findLastCompletelyVisibleItemPosition() == allTutors.size() - 1) {
-                                loadTutors(false);
+                        if (dy > 0) {
+                            LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                            if (layoutManager != null) {
+                                int visibleItemCount = layoutManager.getChildCount();
+                                int totalItemCount = layoutManager.getItemCount();
+                                int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+
+                                if (!isLoading && currentPage < totalPages && (visibleItemCount + firstVisibleItem) >= totalItemCount - 2) {
+                                    currentPage++;
+                                    loadTutors(false);
+                                }
                             }
                         }
                     }
@@ -196,7 +208,7 @@ public class TutorListActivity extends AppCompatActivity {
 
         if (refresh) {
             currentPage = 1;
-            isLastPage = false;
+            totalPages = 1;
         }
 
         isLoading = true;
@@ -209,9 +221,8 @@ public class TutorListActivity extends AppCompatActivity {
             ApiService apiService = ApiClient.getClient().create(ApiService.class);
             String authHeader = "Bearer " + sessionManager.getAccessToken();
             
-            Log.d(TAG, "Token: " + authHeader);
             String domainParam = currentDomain.isEmpty() ? null : currentDomain;
-            Log.d(TAG, "Loading tutors... domain=" + domainParam + ", page=" + currentPage);
+            Log.d("TutorDebug", "Loading tutors... domain=" + domainParam + ", page=" + currentPage);
 
             apiService.getTutorList(authHeader, domainParam, currentPage).enqueue(new Callback<ApiResponse<PaginatedResponse<TutorResponse>>>() {
                 @Override
@@ -220,8 +231,16 @@ public class TutorListActivity extends AppCompatActivity {
                     if (progressBar != null) progressBar.setVisibility(View.GONE);
 
                     if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
-                        PaginatedResponse<TutorResponse> paginatedData = response.body().getData();
-                        List<TutorResponse> tutors = paginatedData.getResults();
+                        PaginatedResponse<TutorResponse> data = response.body().getData();
+                        
+                        int totalCount = data.getCount();
+                        totalPages = (int) Math.ceil((double) totalCount / PAGE_SIZE);
+                        
+                        Log.d("TutorDebug", "Total count: " + totalCount);
+                        Log.d("TutorDebug", "Total pages: " + totalPages);
+                        Log.d("TutorDebug", "Results: " + data.getResults().size());
+
+                        List<TutorResponse> tutors = data.getResults();
                         
                         if (refresh) {
                             allTutors.clear();
@@ -229,8 +248,6 @@ public class TutorListActivity extends AppCompatActivity {
                         
                         if (tutors != null && !tutors.isEmpty()) {
                             allTutors.addAll(tutors);
-                            currentPage++;
-                            
                             if (tvEmpty != null) tvEmpty.setVisibility(View.GONE);
                             if (rvTutors != null) rvTutors.setVisibility(View.VISIBLE);
                             filterLocally();
@@ -242,22 +259,23 @@ public class TutorListActivity extends AppCompatActivity {
                                 }
                                 if (rvTutors != null) rvTutors.setVisibility(View.GONE);
                             }
-                            isLastPage = true;
                         }
 
-                        totalPages = (int) Math.ceil((double) paginatedData.getCount() / PAGE_SIZE);
+                        if (data.getNext() == null) {
+                            totalPages = currentPage;
+                            Log.d("TutorDebug", "No more pages");
+                        }
 
                     } else if (response.code() == 401) {
                         redirectToLogin();
                     } else {
-                        String error = "Unknown error";
-                        try {
-                            if (response.errorBody() != null) {
-                                error = response.errorBody().string();
-                                Log.e(TAG, "Error body: " + error);
-                            }
-                        } catch (Exception ignored) {}
-                        Toast.makeText(TutorListActivity.this, "Failed to load tutors", Toast.LENGTH_SHORT).show();
+                        if (response.code() == 404 && currentPage > 1) {
+                            Log.d("TutorDebug", "No more pages (404)");
+                            return;
+                        }
+                        if (currentPage == 1) {
+                            Toast.makeText(TutorListActivity.this, "Failed to load tutors", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
 
@@ -265,15 +283,15 @@ public class TutorListActivity extends AppCompatActivity {
                 public void onFailure(Call<ApiResponse<PaginatedResponse<TutorResponse>>> call, Throwable t) {
                     isLoading = false;
                     if (progressBar != null) progressBar.setVisibility(View.GONE);
-                    Log.e(TAG, "Network error: " + t.getMessage());
-                    Toast.makeText(TutorListActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    if (currentPage == 1) {
+                        Toast.makeText(TutorListActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    }
                 }
             });
         } catch (Exception e) {
             isLoading = false;
             if (progressBar != null) progressBar.setVisibility(View.GONE);
             Log.e(TAG, "Catch error: " + e.getMessage());
-            Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
 

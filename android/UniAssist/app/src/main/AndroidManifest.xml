@@ -15,6 +15,9 @@
         android:theme="@style/Theme.UniAssist"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".MyBookingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".NotificationsActivity"
             android:exported="false" />
         <activity

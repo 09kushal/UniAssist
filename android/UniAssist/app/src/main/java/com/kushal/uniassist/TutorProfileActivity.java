@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -19,6 +20,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
+import com.kushal.uniassist.models.ApiResponse;
 import com.kushal.uniassist.models.SkillResponse;
 import com.kushal.uniassist.models.SubjectResponse;
 import com.kushal.uniassist.models.TutorResponse;
@@ -39,6 +41,7 @@ public class TutorProfileActivity extends AppCompatActivity {
     private Button btnBook;
     private SessionManager sessionManager;
     private int tutorId;
+    private TutorResponse currentTutor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,7 @@ public class TutorProfileActivity extends AppCompatActivity {
 
         sessionManager = new SessionManager(this);
         tutorId = getIntent().getIntExtra("tutor_id", -1);
+        Log.d("TutorProfile", "Loading tutor ID: " + tutorId);
 
         if (tutorId == -1) {
             Toast.makeText(this, "Invalid tutor ID", Toast.LENGTH_SHORT).show();
@@ -79,8 +83,11 @@ public class TutorProfileActivity extends AppCompatActivity {
         fetchTutorProfile();
 
         btnBook.setOnClickListener(v -> {
+            if (currentTutor == null) return;
             Intent intent = new Intent(this, BookingRequestActivity.class);
             intent.putExtra("tutor_id", tutorId);
+            intent.putExtra("tutor_name", currentTutor.getFullName());
+            intent.putExtra("tutor_price", currentTutor.getPricingPerSession());
             startActivity(intent);
         });
     }
@@ -89,11 +96,11 @@ public class TutorProfileActivity extends AppCompatActivity {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         String authHeader = "Bearer " + sessionManager.getAccessToken();
 
-        apiService.getTutorProfile(authHeader, tutorId).enqueue(new Callback<TutorResponse>() {
+        apiService.getTutorProfile(authHeader, tutorId).enqueue(new Callback<ApiResponse<TutorResponse>>() {
             @Override
-            public void onResponse(Call<TutorResponse> call, Response<TutorResponse> response) {
+            public void onResponse(Call<ApiResponse<TutorResponse>> call, Response<ApiResponse<TutorResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    displayTutor(response.body());
+                    displayTutor(response.body().getData());
                 } else if (response.code() == 401) {
                     redirectToLogin();
                 } else {
@@ -102,13 +109,17 @@ public class TutorProfileActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<TutorResponse> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<TutorResponse>> call, Throwable t) {
                 Toast.makeText(TutorProfileActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void displayTutor(TutorResponse tutor) {
+        this.currentTutor = tutor;
+        Log.d("TutorProfile", "Pricing: " + tutor.getPricingPerSession());
+        Log.d("TutorProfile", "Name: " + tutor.getFullName());
+        
         tvNameLarge.setText(tutor.getFullName());
         tvBio.setText(tutor.getBio());
         
@@ -128,7 +139,7 @@ public class TutorProfileActivity extends AppCompatActivity {
         }
         tvSubjectsLarge.setText(subjects);
         
-        tvPriceLarge.setText("NPR " + tutor.getPricingPerSession() + " per hour");
+        tvPriceLarge.setText("NPR " + tutor.getPricingPerSession() + " per session");
         tvRatingLarge.setText(tutor.getAverageRating() + " ★");
         tvSessionsLarge.setText(String.valueOf(tutor.getTotalSessionsDone()));
 

@@ -1,6 +1,7 @@
 package com.kushal.uniassist.network;
 
 import com.kushal.uniassist.models.ApiResponse;
+import com.kushal.uniassist.models.BookingActionRequest;
 import com.kushal.uniassist.models.PaginatedResponse;
 import com.kushal.uniassist.models.BookingRequest;
 import com.kushal.uniassist.models.BookingResponse;
@@ -61,13 +62,13 @@ public interface ApiService {
     );
 
     @GET("api/tutors/{id}/profile/")
-    Call<TutorResponse> getTutorProfile(
+    Call<ApiResponse<TutorResponse>> getTutorProfile(
             @Header("Authorization") String authHeader,
             @Path("id") int tutorId
     );
 
     @GET("api/tutors/my-profile/")
-    Call<TutorResponse> getMyTutorProfile(
+    Call<ApiResponse<TutorResponse>> getMyTutorProfile(
             @Header("Authorization") String authHeader
     );
 
@@ -79,15 +80,23 @@ public interface ApiService {
     );
 
     @GET("api/booking/my-bookings/")
-    Call<ApiResponse<List<BookingResponse>>> getMyBookings(
-            @Header("Authorization") String authHeader
+    Call<ApiResponse<PaginatedResponse<BookingResponse>>> getMyBookings(
+            @Header("Authorization") String authHeader,
+            @Query("page") int page
     );
 
-    @PATCH("api/booking/{id}/respond/")
-    Call<BookingResponse> respondToBooking(
+    @GET("api/booking/my-requests/")
+    Call<ApiResponse<PaginatedResponse<BookingResponse>>> getTutorBookingRequests(
             @Header("Authorization") String authHeader,
-            @Path("id") int bookingId,
-            @Body RequestBody responseBody
+            @Query("page") int page,
+            @Query("status") String status
+    );
+
+    @PATCH("api/booking/{booking_id}/respond/")
+    Call<ApiResponse<BookingResponse>> respondToBooking(
+            @Header("Authorization") String token,
+            @Path("booking_id") int bookingId,
+            @Body BookingActionRequest request
     );
 
     // Notification Endpoints
