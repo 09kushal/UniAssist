@@ -20,6 +20,9 @@
         android:theme="@style/Theme.UniAssist"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".EsewaPaymentActivity"
+            android:exported="false" />
+        <activity
             android:name=".JoinSessionActivity"
             android:exported="false" />
         <activity

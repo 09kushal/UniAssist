@@ -13,6 +13,8 @@ import com.kushal.uniassist.models.NotificationPaginatedResponse;
 import com.kushal.uniassist.models.NotificationResponse;
 import com.kushal.uniassist.models.OtpVerifyRequest;
 import com.kushal.uniassist.models.OtpVerifyResponse;
+import com.kushal.uniassist.models.PaymentInitiateRequest;
+import com.kushal.uniassist.models.PaymentInitiateResponse;
 import com.kushal.uniassist.models.RegisterRequest;
 import com.kushal.uniassist.models.RegisterResponse;
 import com.kushal.uniassist.models.SkillRequest;
@@ -180,6 +182,13 @@ public interface ApiService {
     @GET("api/notifications/unread-count/")
     Call<ApiResponse<Integer>> getUnreadNotificationCount(
             @Header("Authorization") String authHeader
+    );
+
+    // Payment Endpoints
+    @POST("api/payments/initiate/")
+    Call<ApiResponse<PaymentInitiateResponse>> initiatePayment(
+            @Header("Authorization") String token,
+            @Body PaymentInitiateRequest request
     );
 
     // Password Reset

@@ -24,6 +24,8 @@ import com.kushal.uniassist.network.ApiService;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kushal.uniassist.models.TutorResponse;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -43,6 +45,7 @@ public class MyBookingsActivity extends AppCompatActivity {
     private ApiService apiService;
     private ImageView ivBack;
 
+    private static final int PAY_REQUEST_CODE = 1001;
     private String currentFilter = "all";
     private int currentPage = 1;
 
@@ -93,6 +96,14 @@ public class MyBookingsActivity extends AppCompatActivity {
                 intent.putExtra("user_full_name", userName);
                 intent.putExtra("user_role", "student");
                 startActivity(intent);
+            }
+
+            @Override
+            public void onPay(BookingResponse booking) {
+                Intent intent = new Intent(MyBookingsActivity.this, EsewaPaymentActivity.class);
+                intent.putExtra("booking_id", booking.getId());
+                intent.putExtra("amount", booking.getTutor() != null ? booking.getTutor().getPricingPerSession() : "0");
+                startActivityForResult(intent, PAY_REQUEST_CODE);
             }
         });
         rvBookings.setAdapter(bookingDetailAdapter);
@@ -195,6 +206,16 @@ public class MyBookingsActivity extends AppCompatActivity {
 
     private void cancelBooking(BookingResponse booking) {
         Toast.makeText(this, "Cancelling booking #" + booking.getId(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PAY_REQUEST_CODE && resultCode == RESULT_OK) {
+            Toast.makeText(this, "Payment successful! Refreshing bookings...", Toast.LENGTH_SHORT).show();
+            currentPage = 1;
+            fetchBookings();
+        }
     }
 
     private void redirectToLogin() {

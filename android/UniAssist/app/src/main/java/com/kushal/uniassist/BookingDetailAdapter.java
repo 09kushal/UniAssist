@@ -25,6 +25,7 @@ public class BookingDetailAdapter extends RecyclerView.Adapter<BookingDetailAdap
     public interface OnBookingActionListener {
         void onCancel(BookingResponse booking);
         void onJoin(BookingResponse booking);
+        void onPay(BookingResponse booking);
     }
 
     public BookingDetailAdapter(OnBookingActionListener listener) {
@@ -117,12 +118,20 @@ public class BookingDetailAdapter extends RecyclerView.Adapter<BookingDetailAdap
 
             if ("pending".equals(status)) {
                 btnCancel.setVisibility(View.VISIBLE);
+                btnJoin.setVisibility(View.GONE);
                 llActions.setVisibility(View.VISIBLE);
                 btnCancel.setOnClickListener(v -> listener.onCancel(booking));
-            } else if ("accepted".equals(status) && booking.isOfficiallyScheduled()) {
-                btnJoin.setVisibility(View.VISIBLE);
+            } else if ("accepted".equals(status)) {
                 llActions.setVisibility(View.VISIBLE);
-                btnJoin.setOnClickListener(v -> listener.onJoin(booking));
+                btnCancel.setVisibility(View.GONE);
+                btnJoin.setVisibility(View.VISIBLE);
+                if (booking.isOfficiallyScheduled()) {
+                    btnJoin.setText("Join Session");
+                    btnJoin.setOnClickListener(v -> listener.onJoin(booking));
+                } else {
+                    btnJoin.setText("Pay Now");
+                    btnJoin.setOnClickListener(v -> listener.onPay(booking));
+                }
             }
         }
     }
