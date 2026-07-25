@@ -1,6 +1,8 @@
 package com.kushal.uniassist.network;
 
 import com.kushal.uniassist.models.ApiResponse;
+import com.kushal.uniassist.models.AvailabilityRequest;
+import com.kushal.uniassist.models.AvailabilitySlot;
 import com.kushal.uniassist.models.BookingActionRequest;
 import com.kushal.uniassist.models.PaginatedResponse;
 import com.kushal.uniassist.models.BookingRequest;
@@ -13,15 +15,22 @@ import com.kushal.uniassist.models.OtpVerifyRequest;
 import com.kushal.uniassist.models.OtpVerifyResponse;
 import com.kushal.uniassist.models.RegisterRequest;
 import com.kushal.uniassist.models.RegisterResponse;
+import com.kushal.uniassist.models.SkillRequest;
+import com.kushal.uniassist.models.SkillResponse;
 import com.kushal.uniassist.models.StudentProfileResponse;
+import com.kushal.uniassist.models.SubjectRequest;
+import com.kushal.uniassist.models.SubjectResponse;
+import com.kushal.uniassist.models.TutorProfileRequest;
 import com.kushal.uniassist.models.TutorRegisterRequest;
 import com.kushal.uniassist.models.TutorResponse;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
@@ -70,6 +79,57 @@ public interface ApiService {
     @GET("api/tutors/my-profile/")
     Call<ApiResponse<TutorResponse>> getMyTutorProfile(
             @Header("Authorization") String authHeader
+    );
+
+    @PATCH("api/tutors/profile/setup/")
+    Call<ApiResponse<TutorResponse>> setupTutorProfile(
+            @Header("Authorization") String token,
+            @Body TutorProfileRequest request
+    );
+
+    @Multipart
+    @PATCH("api/tutors/profile/setup/")
+    Call<ApiResponse<TutorResponse>> setupTutorProfileWithPhoto(
+            @Header("Authorization") String token,
+            @Part("bio") RequestBody bio,
+            @Part("pricing_per_session") RequestBody pricing,
+            @Part MultipartBody.Part photo
+    );
+
+    @POST("api/tutors/subjects/add/")
+    Call<ApiResponse<SubjectResponse>> addSubject(
+            @Header("Authorization") String token,
+            @Body SubjectRequest request
+    );
+
+    @DELETE("api/tutors/subjects/{id}/remove/")
+    Call<ApiResponse<Object>> removeSubject(
+            @Header("Authorization") String token,
+            @Path("id") int subjectId
+    );
+
+    @POST("api/tutors/skills/add/")
+    Call<ApiResponse<SkillResponse>> addSkill(
+            @Header("Authorization") String token,
+            @Body SkillRequest request
+    );
+
+    @DELETE("api/tutors/skills/{id}/remove/")
+    Call<ApiResponse<Object>> removeSkill(
+            @Header("Authorization") String token,
+            @Path("id") int skillId
+    );
+
+    @POST("api/tutors/availability/add/")
+    Call<ApiResponse<AvailabilitySlot>> addAvailability(
+            @Header("Authorization") String token,
+            @Body AvailabilityRequest request
+    );
+
+    @DELETE("api/tutors/availability/{id}/remove/")
+    Call<ApiResponse<Object>> removeAvailability(
+            @Header("Authorization") String token,
+            @Path("id") int slotId
     );
 
     // Booking Endpoints
