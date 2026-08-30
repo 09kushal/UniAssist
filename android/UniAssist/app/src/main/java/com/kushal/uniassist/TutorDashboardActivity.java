@@ -39,6 +39,7 @@ public class TutorDashboardActivity extends AppCompatActivity {
     private android.widget.ImageButton btnNotifications;
     private CardView cardBookings, cardProfile, cardPayouts, cardReports;
     private Button btnLogout;
+    private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout;
     private SessionManager sessionManager;
 
     @Override
@@ -77,6 +78,12 @@ public class TutorDashboardActivity extends AppCompatActivity {
 
         btnNotifications = findViewById(R.id.btnNotifications);
         tvNotifBadge = findViewById(R.id.tvNotifBadge);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            fetchTutorProfile();
+            loadNotificationCount();
+        });
 
         btnNotifications.setOnClickListener(v -> {
             startActivity(new Intent(this, NotificationsActivity.class));
@@ -110,6 +117,7 @@ public class TutorDashboardActivity extends AppCompatActivity {
         apiService.getUnreadCount(token).enqueue(new Callback<ApiResponse<UnreadCountResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<UnreadCountResponse>> call, Response<ApiResponse<UnreadCountResponse>> response) {
+                swipeRefreshLayout.setRefreshing(false);
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     int count = response.body().getData().getUnreadCount();
                     if (count > 0) {
@@ -123,6 +131,7 @@ public class TutorDashboardActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ApiResponse<UnreadCountResponse>> call, Throwable t) {
+                swipeRefreshLayout.setRefreshing(false);
                 Log.e("TutorDash", "Notif count failed");
             }
         });
@@ -141,6 +150,7 @@ public class TutorDashboardActivity extends AppCompatActivity {
         apiService.getMyTutorProfile(authHeader).enqueue(new Callback<ApiResponse<TutorResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<TutorResponse>> call, Response<ApiResponse<TutorResponse>> response) {
+                swipeRefreshLayout.setRefreshing(false);
                 Log.e("TutorDash", "=== GOT RESPONSE ===");
                 Log.e("TutorDash", "Code: " + response.code());
                 Log.e("TutorDash", "Body null: " + (response.body() == null));
@@ -176,6 +186,7 @@ public class TutorDashboardActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ApiResponse<TutorResponse>> call, Throwable t) {
+                swipeRefreshLayout.setRefreshing(false);
                 Log.e("TutorDash", "=== FAILURE ===");
                 Log.e("TutorDash", "Error: " + t.getMessage());
                 Toast.makeText(TutorDashboardActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();

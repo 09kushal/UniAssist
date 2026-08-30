@@ -59,6 +59,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
     private ImageView ivSearchBtn, ivStudentPhoto, ivWhatsApp, ivInstagram, ivAppLogo;
     private LinearLayout llFacebook, llWhatsApp, llInstagram;
     private android.widget.ImageButton btnNotifications;
+    private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout;
     private androidx.core.widget.NestedScrollView nestedScrollView;
     private CardView cardHowSearch, cardHowBook, cardHowPay, cardHowJoin, cardContactAdmin, cardReportProblem;
     private RecyclerView rvFeaturedTutors, rvRecentBookings;
@@ -106,6 +107,12 @@ public class StudentDashboardActivity extends AppCompatActivity {
         tvSessionsDone = findViewById(R.id.tvSessionsDone);
         tvPendingCount = findViewById(R.id.tvPendingCount);
         tvNotifBadge = findViewById(R.id.tvNotifBadge);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            loadDashboardData();
+            loadNotificationCount();
+        });
         btnNotifications = findViewById(R.id.btnNotifications);
         
         btnAcademic = findViewById(R.id.btnAcademic);
@@ -442,6 +449,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
         apiService.getUnreadCount(token).enqueue(new Callback<ApiResponse<UnreadCountResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<UnreadCountResponse>> call, Response<ApiResponse<UnreadCountResponse>> response) {
+                swipeRefreshLayout.setRefreshing(false);
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     updateNotifBadge(response.body().getData().getUnreadCount());
                 }
@@ -449,6 +457,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ApiResponse<UnreadCountResponse>> call, Throwable t) {
+                swipeRefreshLayout.setRefreshing(false);
                 Log.e("Dashboard", "Notif count failed");
             }
         });
@@ -473,12 +482,15 @@ public class StudentDashboardActivity extends AppCompatActivity {
         apiService.getTutorList(authHeader, domain, 1).enqueue(new Callback<ApiResponse<PaginatedResponse<TutorResponse>>>() {
             @Override
             public void onResponse(Call<ApiResponse<PaginatedResponse<TutorResponse>>> call, Response<ApiResponse<PaginatedResponse<TutorResponse>>> response) {
+                swipeRefreshLayout.setRefreshing(false);
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     setupFeaturedTutors(response.body().getData().getResults());
                 }
             }
             @Override
-            public void onFailure(Call<ApiResponse<PaginatedResponse<TutorResponse>>> call, Throwable t) {}
+            public void onFailure(Call<ApiResponse<PaginatedResponse<TutorResponse>>> call, Throwable t) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
         });
     }
 
@@ -487,6 +499,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
         apiService.getMyBookings(authHeader, 1).enqueue(new Callback<ApiResponse<PaginatedResponse<BookingResponse>>>() {
             @Override
             public void onResponse(Call<ApiResponse<PaginatedResponse<BookingResponse>>> call, Response<ApiResponse<PaginatedResponse<BookingResponse>>> response) {
+                swipeRefreshLayout.setRefreshing(false);
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     List<BookingResponse> bookings = response.body().getData().getResults();
                     tvBookingCount.setText(String.valueOf(bookings.size()));
@@ -512,7 +525,9 @@ public class StudentDashboardActivity extends AppCompatActivity {
                 }
             }
             @Override
-            public void onFailure(Call<ApiResponse<PaginatedResponse<BookingResponse>>> call, Throwable t) {}
+            public void onFailure(Call<ApiResponse<PaginatedResponse<BookingResponse>>> call, Throwable t) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
         });
     }
 
