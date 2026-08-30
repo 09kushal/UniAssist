@@ -78,6 +78,41 @@ public class MyBookingsActivity extends AppCompatActivity {
         fetchBookings();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkPendingReview();
+    }
+
+    private void checkPendingReview() {
+        int bookingId = sessionManager.getPendingReviewBookingId();
+        if (bookingId != -1) {
+            // Clear flag immediately so it doesn't repeat
+            sessionManager.clearPendingReview();
+
+            // Check if already reviewed
+            String authHeader = "Bearer " + sessionManager.getAccessToken();
+            apiService.checkReview(authHeader, bookingId).enqueue(new Callback<ApiResponse<com.kushal.uniassist.models.ReviewCheckResponse>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<com.kushal.uniassist.models.ReviewCheckResponse>> call, Response<ApiResponse<com.kushal.uniassist.models.ReviewCheckResponse>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        if (!response.body().getData().isHasReviewed()) {
+                            // Show review screen
+                            Intent intent = new Intent(MyBookingsActivity.this, SubmitReviewActivity.class);
+                            intent.putExtra("booking_id", bookingId);
+                            startActivity(intent);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<com.kushal.uniassist.models.ReviewCheckResponse>> call, Throwable t) {
+                    Log.e("MyBookings", "Review check failed", t);
+                }
+            });
+        }
+    }
+
     private void setupRecyclerView() {
         rvBookings.setLayoutManager(new LinearLayoutManager(this));
         bookingDetailAdapter = new BookingDetailAdapter(new BookingDetailAdapter.OnBookingActionListener() {
@@ -90,6 +125,9 @@ public class MyBookingsActivity extends AppCompatActivity {
             public void onJoin(BookingResponse booking) {
                 String userName = sessionManager.getFullName();
                 if (userName == null) userName = "Student";
+
+                // Set pending review flag
+                sessionManager.setPendingReviewBookingId(booking.getId());
 
                 Intent intent = new Intent(MyBookingsActivity.this, JoinSessionActivity.class);
                 intent.putExtra("booking_id", booking.getId());
@@ -104,6 +142,24 @@ public class MyBookingsActivity extends AppCompatActivity {
                 intent.putExtra("booking_id", booking.getId());
                 intent.putExtra("amount", booking.getTutor() != null ? booking.getTutor().getPricingPerSession() : "0");
                 startActivityForResult(intent, PAY_REQUEST_CODE);
+            }
+
+            @Override
+            public void onPaymentCompleted() {
+                currentPage = 1;
+                fetchBookings();
+            }
+
+            @Override
+            public void onReport(BookingResponse booking) {
+                // To be implemented
+                Toast.makeText(MyBookingsActivity.this, "Reporting not implemented yet", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onReschedule(BookingResponse booking) {
+                // To be implemented
+                Toast.makeText(MyBookingsActivity.this, "Rescheduling not implemented yet", Toast.LENGTH_SHORT).show();
             }
         });
         rvBookings.setAdapter(bookingDetailAdapter);

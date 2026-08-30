@@ -20,6 +20,7 @@ from reports.views import (
     AdminRescheduleListView,
     AdminReportActionView,
     AdminTutorVerificationView,
+    MyReportsView,
     StudentFileLatenessReportView,
     StudentRescheduleRequestView,
     TutorFileStudentReportView,
@@ -28,6 +29,9 @@ from reports.views import (
 app_name = 'reports'
 
 urlpatterns = [
+    # ── General endpoints ───────────────────────────────────────────────────
+    path('my-reports/', MyReportsView.as_view(), name='my-reports'),
+
     # ── Student endpoints ───────────────────────────────────────────────────
     # Student files lateness report against tutor
     path('lateness/file/', StudentFileLatenessReportView.as_view(), name='student-file-lateness'),

@@ -11,6 +11,7 @@ public class SessionManager {
     private static final String KEY_ROLE = "role";
     private static final String KEY_FULL_NAME = "full_name";
     private static final String KEY_EMAIL = "email";
+    private static final String KEY_PROFILE_PHOTO = "profile_photo";
 
     private SharedPreferences prefs;
 
@@ -19,12 +20,17 @@ public class SessionManager {
     }
 
     public void saveSession(String accessToken, String refreshToken, String role, String fullName, String email) {
+        saveSession(accessToken, refreshToken, role, fullName, email, null);
+    }
+
+    public void saveSession(String accessToken, String refreshToken, String role, String fullName, String email, String photoUrl) {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(KEY_ACCESS_TOKEN, accessToken);
         editor.putString(KEY_REFRESH_TOKEN, refreshToken);
         editor.putString(KEY_ROLE, role);
         editor.putString(KEY_FULL_NAME, fullName);
         editor.putString(KEY_EMAIL, email);
+        editor.putString(KEY_PROFILE_PHOTO, photoUrl);
         editor.apply();
     }
 
@@ -50,6 +56,14 @@ public class SessionManager {
         return prefs.getString(KEY_EMAIL, null);
     }
 
+    public String getProfilePhoto() {
+        return prefs.getString(KEY_PROFILE_PHOTO, null);
+    }
+
+    public String getUserName() {
+        return getFullName();
+    }
+
     public boolean isLoggedIn() {
         return getAccessToken() != null;
     }
@@ -58,5 +72,17 @@ public class SessionManager {
         SharedPreferences.Editor editor = prefs.edit();
         editor.clear();
         editor.apply();
+    }
+
+    public void setPendingReviewBookingId(int bookingId) {
+        prefs.edit().putInt("pending_review_booking_id", bookingId).apply();
+    }
+
+    public int getPendingReviewBookingId() {
+        return prefs.getInt("pending_review_booking_id", -1);
+    }
+
+    public void clearPendingReview() {
+        prefs.edit().remove("pending_review_booking_id").apply();
     }
 }

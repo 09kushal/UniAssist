@@ -51,6 +51,8 @@ import base64
 import logging
 import uuid
 import json
+import datetime
+from decimal import Decimal
 
 from django.conf import settings
 from django.utils import timezone
@@ -60,7 +62,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 
 from accounts.models import Student, Tutor
-from booking.models import Booking
+from booking.models import Booking, Session
 from payments.models import Payment, Payout
 from payments.serializers import (
     InitiatePaymentSerializer,
@@ -127,6 +129,29 @@ def _verify_esewa_signature(data: dict) -> bool:
     except Exception as exc:
         logger.error('eSewa signature verification error: %s', exc)
         return False
+
+
+def create_pending_payout(booking, amount):
+    """
+    Idempotent helper to create a Payout record in 'pending' status.
+    Uses EXACT commission formula from DATABASE_SCHEMA.md.
+    """
+    session_price     = amount
+    commission_amount = round(session_price * Decimal(str(PLATFORM_COMMISSION_RATE)), 2)
+    tutor_base_share  = round(session_price * Decimal(str(TUTOR_BASE_SHARE_RATE)), 2)
+
+    payout, created = Payout.objects.get_or_create(
+        booking=booking,
+        defaults={
+            'tutor':              booking.tutor,
+            'total_paid':         session_price,
+            'commission_amount':  commission_amount,
+            'tutor_base_share':   tutor_base_share,
+            'tutor_final_payout': tutor_base_share,
+            'payout_status':      Payout.PayoutStatus.HELD,
+        }
+    )
+    return payout
 
 
 # ─── Custom Pagination ────────────────────────────────────────────────────────
@@ -349,6 +374,9 @@ class PaymentCallbackView(APIView):
                 booking = payment.booking
                 booking.officially_scheduled = True
                 booking.save(update_fields=['officially_scheduled'])
+
+                # Create Pending Payout
+                create_pending_payout(booking, payment.amount)
 
                 from notifications.services import notify_payment_confirmed
                 notify_payment_confirmed(booking)
@@ -693,3 +721,116 @@ class TutorPayoutHistoryView(APIView):
                 'results':  serializer.data,
             },
         )
+
+
+# ─── 7. Demo Payment Complete API (DEMO ONLY) ───────────────────────────────
+
+class DemoPaymentCompleteView(APIView):
+    """
+    POST /api/payments/demo-complete/
+    Auth: Student JWT required.
+
+    Bypasses eSewa to mark a booking as paid and officially scheduled.
+    Used for development/testing without real eSewa interaction.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        booking_id = request.data.get('booking_id')
+
+        if not booking_id:
+            return error_response(
+                message="booking_id required",
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # Security: Must be the student who owns the booking
+            booking = Booking.objects.select_related('student__user', 'tutor__user').get(
+                id=booking_id,
+                student__user=request.user
+            )
+
+            # Only accepted bookings can be paid
+            if booking.booking_status != Booking.BookingStatus.ACCEPTED:
+                return error_response(
+                    message=f"Booking is not in accepted status. Current: {booking.booking_status}",
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Check if already paid
+            if Payment.objects.filter(booking=booking, payment_status=Payment.PaymentStatus.COMPLETED).exists():
+                 return error_response(
+                    message="This booking has already been paid.",
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Create or update payment to Completed
+            payment, created = Payment.objects.get_or_create(
+                booking=booking,
+                defaults={
+                    'amount': booking.tutor.pricing_per_session,
+                    'payment_status': Payment.PaymentStatus.COMPLETED,
+                    'esewa_ref_id': f'DEMO-{uuid.uuid4().hex[:6].upper()}',
+                    'paid_at': timezone.now()
+                }
+            )
+
+            if not created:
+                payment.payment_status = Payment.PaymentStatus.COMPLETED
+                payment.esewa_ref_id = f'DEMO-{uuid.uuid4().hex[:6].upper()}'
+                payment.paid_at = timezone.now()
+                payment.save(update_fields=['payment_status', 'esewa_ref_id', 'paid_at'])
+
+            # 1. Mark booking officially scheduled
+            booking.officially_scheduled = True
+            booking.save(update_fields=['officially_scheduled'])
+
+            # 2. Create Pending Payout (Auto-creation logic)
+            create_pending_payout(booking, payment.amount)
+
+            # 3. Create Session (Phase 9 integration)
+            try:
+                # Naive combine
+                scheduled_dt = datetime.datetime.combine(
+                    booking.proposed_date,
+                    booking.proposed_start_time
+                )
+                if timezone.is_naive(scheduled_dt):
+                    scheduled_dt = timezone.make_aware(scheduled_dt)
+
+                Session.objects.get_or_create(
+                    booking=booking,
+                    defaults={
+                        'scheduled_at': scheduled_dt,
+                        'officially_scheduled': True,
+                        'session_status': Session.SessionStatus.PENDING
+                    }
+                )
+            except Exception as e:
+                logger.error("Failed to auto-create Session in DemoPayment: %s", e)
+
+            # 4. Notify parties
+            from notifications.services import notify_payment_confirmed
+            notify_payment_confirmed(booking)
+
+            return success_response(
+                message="Demo payment marked complete. Session scheduled and Payout pending.",
+                data={
+                    "booking_id": booking.id,
+                    "officially_scheduled": True,
+                    "payment_status": "completed"
+                }
+            )
+
+        except Booking.DoesNotExist:
+            return error_response(
+                message="Booking not found or not owned by you.",
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            logger.error("Unexpected error in DemoPaymentCompleteView: %s", e)
+            return error_response(
+                message=str(e),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

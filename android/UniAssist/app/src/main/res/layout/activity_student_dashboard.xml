@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="#EEF2FF">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
@@ -19,14 +21,118 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_header_gradient"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:paddingBottom="48dp">
+                android:orientation="vertical">
 
-                <RelativeLayout
+                <!-- TOP BAR -->
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="72dp"
+                    android:background="@color/primary"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- Logo + Tagline side by side -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:id="@+id/ivAppLogo"
+                            android:layout_width="110dp"
+                            android:layout_height="38dp"
+                            android:src="@drawable/ic_uniassist_logo"
+                            android:scaleType="fitStart"
+                            android:adjustViewBounds="true"
+                            android:background="@android:color/transparent"
+                            android:contentDescription="UniAssist Logo"/>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="26dp"
+                            android:background="#40FFFFFF"
+                            android:layout_marginHorizontal="10dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Learn • Connect • Succeed"
+                            android:textSize="11sp"
+                            android:textColor="#99FFFFFF"
+                            android:textStyle="italic"
+                            android:letterSpacing="0.05"/>
+
+                    </LinearLayout>
+
+                    <!-- Bell notification -->
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp">
+
+                        <ImageButton
+                            android:id="@+id/btnNotifications"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_notifications"
+                            android:contentDescription="Notifications"
+                            app:tint="@color/surface"/>
+
+                        <TextView
+                            android:id="@+id/tvNotifBadge"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="top|end"
+                            android:background="@drawable/bg_error_badge"
+                            android:gravity="center"
+                            android:textColor="@color/surface"
+                            android:textSize="9sp"
+                            android:textStyle="bold"
+                            android:visibility="gone"
+                            android:text="0"/>
+
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- STUDENT GREETING WITH PHOTO -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="12dp"
+                    android:background="#EEF2FF">
+
+                    <!-- Student profile photo -->
+                    <FrameLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:id="@+id/ivStudentPhoto"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:scaleType="centerCrop"
+                            android:background="@drawable/bg_teal_circle"
+                            android:contentDescription="Profile photo" />
+
+                        <TextView
+                            android:id="@+id/tvStudentInitial"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:textColor="@color/surface"
+                            android:textStyle="bold"
+                            android:textSize="20sp"
+                            android:text="S"/>
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -37,103 +143,119 @@
                             android:id="@+id/tvGreeting"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/welcome_back"
-                            android:textColor="@color/white"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
+                            android:text="Good Morning,"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp"/>
 
                         <TextView
+                            android:id="@+id/tvStudentName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:alpha="0.8"
-                            android:text="@string/what_learn"
-                            android:textColor="@color/white"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <RelativeLayout
-                        android:id="@+id/rlNotifications"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_toStartOf="@id/flAvatar"
-                        android:layout_marginEnd="12dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_centerInParent="true"
-                            android:src="@android:drawable/ic_popup_reminder"
-                            app:tint="@color/accent" />
-
-                        <View
-                            android:id="@+id/vNotifBadge"
-                            android:layout_width="8dp"
-                            android:layout_height="8dp"
-                            android:layout_alignParentEnd="true"
-                            android:layout_marginTop="8dp"
-                            android:background="@drawable/bg_unread_indicator"
-                            android:backgroundTint="@color/error"
-                            android:visibility="gone" />
-                    </RelativeLayout>
-
-                    <FrameLayout
-                        android:id="@+id/flAvatar"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:layout_alignParentEnd="true"
-                        android:background="@drawable/bg_teal_circle"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <TextView
-                            android:id="@+id/tvAvatarLetter"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:textColor="@color/white"
+                            android:textColor="@color/text_primary"
                             android:textStyle="bold"
                             android:textSize="18sp"
-                            android:text="S"/>
-                    </FrameLayout>
+                            android:text="Student"/>
+                    </LinearLayout>
+                </LinearLayout>
 
-                </RelativeLayout>
-
+                <!-- DOMAIN TOGGLE -->
                 <LinearLayout
-                    android:id="@+id/llSearch"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="24dp"
-                    android:background="@drawable/bg_search_bar"
-                    android:gravity="center_vertical"
+                    android:layout_height="44dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/bg_toggle_container"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="16dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_search"
-                        app:tint="@color/accent" />
+                    android:padding="4dp">
 
                     <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:text="@string/search_hint"
-                        android:textColor="@color/text_hint"
-                        android:textSize="14sp" />
+                        android:id="@+id/btnAcademic"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_toggle_selected"
+                        android:gravity="center"
+                        android:text="Academic Domain"
+                        android:textColor="@color/surface"
+                        android:textStyle="bold"
+                        android:textSize="13sp"/>
+
+                    <TextView
+                        android:id="@+id/btnSkill"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="Skills Domain"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"/>
                 </LinearLayout>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_search"
+                            app:tint="@color/text_hint"
+                            android:layout_marginEnd="8dp"
+                            android:contentDescription="Search icon" />
+
+                        <EditText
+                            android:id="@+id/etSearch"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:hint="Search tutors, subjects..."
+                            android:textColorHint="@color/text_hint"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"
+                            android:imeOptions="actionSearch"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:importantForAutofill="no" />
+
+                        <ImageView
+                            android:id="@+id/ivSearchBtn"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_button_teal"
+                            android:padding="6dp"
+                            android:src="@drawable/ic_search"
+                            app:tint="@color/surface"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="Search button" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
             </LinearLayout>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
-
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="8dp"
+        android:paddingBottom="80dp"
         android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -141,15 +263,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="24dp">
+            android:paddingTop="8dp">
 
-            <!-- Stats Row -->
+            <!-- STATS ROW -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:paddingTop="8dp"
                 android:paddingHorizontal="16dp"
+                android:layout_marginBottom="24dp"
                 android:weightSum="3">
 
                 <androidx.cardview.widget.CardView
@@ -158,24 +279,18 @@
                     android:layout_margin="4dp"
                     android:layout_weight="1"
                     app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardElevation="2dp">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="12dp">
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@android:drawable/ic_menu_today"
-                            app:tint="@color/accent" />
+                        android:padding="12dp"
+                        android:background="@drawable/bg_stat_teal">
                         <TextView
                             android:id="@+id/tvBookingCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
                             android:text="0"
                             android:textColor="@color/primary"
                             android:textStyle="bold"
@@ -183,7 +298,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/bookings"
+                            android:text="Bookings"
                             android:textColor="@color/text_secondary"
                             android:textSize="10sp" />
                     </LinearLayout>
@@ -195,24 +310,18 @@
                     android:layout_margin="4dp"
                     android:layout_weight="1"
                     app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardElevation="2dp">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="12dp">
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@android:drawable/ic_menu_recent_history"
-                            app:tint="@color/accent" />
+                        android:padding="12dp"
+                        android:background="@drawable/bg_stat_navy">
                         <TextView
                             android:id="@+id/tvSessionsDone"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
                             android:text="0"
                             android:textColor="@color/primary"
                             android:textStyle="bold"
@@ -220,7 +329,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/sessions"
+                            android:text="Sessions"
                             android:textColor="@color/text_secondary"
                             android:textSize="10sp" />
                     </LinearLayout>
@@ -232,24 +341,18 @@
                     android:layout_margin="4dp"
                     android:layout_weight="1"
                     app:cardCornerRadius="12dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
+                    app:cardElevation="2dp">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="12dp">
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@android:drawable/btn_star_big_on"
-                            app:tint="@color/accent" />
+                        android:padding="12dp"
+                        android:background="@drawable/bg_stat_purple">
                         <TextView
                             android:id="@+id/tvPendingCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
                             android:text="0"
                             android:textColor="@color/primary"
                             android:textStyle="bold"
@@ -257,435 +360,470 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/reviews"
+                            android:text="Pending"
                             android:textColor="@color/text_secondary"
                             android:textSize="10sp" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
 
+            <!-- SECTION TITLE -->
+            <LinearLayout
+                android:id="@+id/llSectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="12dp">
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="28dp"
+                    android:background="@color/primary"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:id="@+id/tvSectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Academic Excellence"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    android:textSize="20sp"/>
+            </LinearLayout>
+
+            <!-- TOP TUTORS -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:paddingHorizontal="20dp">
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="8dp">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/quick_actions"
-                    android:textColor="@color/primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:text="Top Tutors"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/tvViewAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="View All"
+                    android:textColor="@color/accent"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
             </RelativeLayout>
+
+            <!-- FEATURED TUTORS -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvFeaturedTutors"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:clipToPadding="false"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- HOW IT WORKS -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="How It Works"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="12dp"/>
 
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
                 android:rowCount="2"
-                android:padding="16dp"
-                android:useDefaultMargins="true">
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="24dp">
 
-                <!-- Card 1: Find Tutor (teal gradient) -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cardFindTutor"
+                    android:id="@+id/cardHowSearch"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="6dp"
-                    android:clickable="true"
-                    android:focusable="true"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/primary">
-
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#E8EEFF">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center_vertical">
-
+                        android:gravity="center">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="🔍"
-                            android:textSize="28sp"/>
-
+                            android:textSize="24sp"/>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/find_tutor"
-                            android:textColor="@color/white"
+                            android:text="Search"
+                            android:textColor="@color/primary"
                             android:textStyle="bold"
-                            android:textSize="14sp"
-                            android:layout_marginTop="8dp"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="500+ tutors"
-                            android:textColor="#CCFFFFFF"
-                            android:textSize="11sp"/>
+                            android:textSize="13sp"
+                            android:layout_marginTop="4dp"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- Card 2: My Bookings -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cardMyBookings"
+                    android:id="@+id/cardHowBook"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="6dp"
-                    android:clickable="true"
-                    android:focusable="true"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
-
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#E8EEFF">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center_vertical">
-
+                        android:gravity="center">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="📅"
-                            android:textSize="28sp"/>
-
+                            android:textSize="24sp"/>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/my_bookings"
+                            android:text="Book Session"
                             android:textColor="@color/primary"
                             android:textStyle="bold"
-                            android:textSize="14sp"
-                            android:layout_marginTop="8dp"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/view_sessions"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="11sp"/>
+                            android:textSize="13sp"
+                            android:layout_marginTop="4dp"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- Card 3: Notifications -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cardNotifications"
+                    android:id="@+id/cardHowPay"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="6dp"
-                    android:clickable="true"
-                    android:focusable="true"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
-
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#E8EEFF">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center_vertical">
-
+                        android:gravity="center">
+                        <!-- Custom eSewa Logo -->
+                        <LinearLayout
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_icon_circle"
+                            android:gravity="center"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="e"
+                                android:textColor="#60BB46"
+                                android:textStyle="bold"
+                                android:textSize="22sp"/>
+                        </LinearLayout>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🔔"
-                            android:textSize="28sp"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Notifications"
+                            android:text="Pay via eSewa"
                             android:textColor="@color/primary"
                             android:textStyle="bold"
-                            android:textSize="14sp"
-                            android:layout_marginTop="8dp"/>
-
-                        <TextView
-                            android:id="@+id/tvNotifCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 unread"
-                            android:textColor="@color/accent"
-                            android:textSize="11sp"/>
+                            android:textSize="13sp"
+                            android:layout_marginTop="4dp"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- Card 4: My Profile -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cardMyProfile"
+                    android:id="@+id/cardHowJoin"
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="100dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="6dp"
-                    android:clickable="true"
-                    android:focusable="true"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
-
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#E8EEFF">
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center_vertical">
-
+                        android:gravity="center">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="👤"
-                            android:textSize="28sp"/>
-
+                            android:text="🎓"
+                            android:textSize="24sp"/>
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="My Profile"
+                            android:text="Join to Learn"
                             android:textColor="@color/primary"
                             android:textStyle="bold"
-                            android:textSize="14sp"
-                            android:layout_marginTop="8dp"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Edit your info"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="11sp"/>
+                            android:textSize="13sp"
+                            android:layout_marginTop="4dp"/>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </GridLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="16dp"
-                android:text="@string/featured_tutors"
-                android:textColor="@color/primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvFeaturedTutors"
+            <!-- RECENT BOOKINGS -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:clipToPadding="false"
-                android:paddingHorizontal="12dp"
-                android:orientation="horizontal" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="24dp"
-                android:text="@string/my_bookings"
-                android:textColor="@color/primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvNoBookings"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:padding="24dp"
-                android:text="No bookings yet.\nTap Find Tutor to get started!"
-                android:textColor="@color/text_secondary"
-                android:visibility="gone" />
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Recent Bookings"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    android:textSize="18sp"/>
+                <TextView
+                    android:id="@+id/tvSeeAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="See All"
+                    android:textColor="@color/accent"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvRecentBookings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:nestedScrollingEnabled="false"
-                android:paddingHorizontal="12dp" />
+                android:paddingHorizontal="16dp"
+                android:nestedScrollingEnabled="false"/>
 
+            <TextView
+                android:id="@+id/tvNoBookings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="No bookings yet."
+                android:textColor="@color/text_secondary"
+                android:padding="24dp"
+                android:visibility="gone"/>
+
+            <!-- SUPPORT & FEEDBACK -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="24dp"
-                android:text="@string/reviews"
-                android:textColor="@color/primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:text="Support &amp; Feedback"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="12dp"/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvReviews"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardContactAdmin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:nestedScrollingEnabled="false"
-                android:paddingHorizontal="12dp"
-                android:paddingBottom="80dp" />
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="#FFFFFF">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="24dp"
-                android:text="@string/how_it_works"
-                android:textColor="@color/primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:scrollbars="none"
-                android:paddingHorizontal="12dp">
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <!-- Step 1 -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="140dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp">
+                        android:text="Contact Admin"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="12dp"/>
+
+                    <!-- Social media row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <!-- Facebook -->
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:id="@+id/llFacebook"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
+                            android:layout_weight="1"
                             android:orientation="vertical"
-                            android:padding="16dp">
-                            <TextView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:background="@drawable/bg_unread_indicator"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textColor="@color/white"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="8dp">
+
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:layout_marginTop="12dp"
-                                android:src="@android:drawable/ic_menu_search"
-                                app:tint="@color/accent" />
+                                android:layout_width="52dp"
+                                android:layout_height="52dp"
+                                android:src="@drawable/ic_facebook"
+                                android:scaleType="fitCenter"
+                                android:contentDescription="Facebook"/>
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="@string/find_tutor"
-                                android:textColor="@color/primary"
-                                android:textStyle="bold"
-                                android:textSize="12sp" />
+                                android:text="Facebook"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp"
+                                android:layout_marginTop="6dp"/>
                         </LinearLayout>
-                    </androidx.cardview.widget.CardView>
 
-                    <!-- Step 2 -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="140dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp">
+                        <!-- WhatsApp -->
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:id="@+id/llWhatsApp"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
+                            android:layout_weight="1"
                             android:orientation="vertical"
-                            android:padding="16dp">
-                            <TextView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:background="@drawable/bg_unread_indicator"
-                                android:gravity="center"
-                                android:text="2"
-                                android:textColor="@color/white"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="8dp">
+
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:layout_marginTop="12dp"
-                                android:src="@android:drawable/ic_menu_today"
-                                app:tint="@color/primary" />
+                                android:layout_width="52dp"
+                                android:layout_height="52dp"
+                                android:src="@drawable/ic_whatsapp"
+                                android:scaleType="fitCenter"
+                                android:contentDescription="WhatsApp"/>
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="@string/book_session"
-                                android:textColor="@color/primary"
-                                android:textStyle="bold"
-                                android:textSize="12sp" />
+                                android:text="WhatsApp"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp"
+                                android:layout_marginTop="6dp"/>
                         </LinearLayout>
-                    </androidx.cardview.widget.CardView>
 
-                    <!-- Step 3 -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="140dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp">
+                        <!-- Instagram -->
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:id="@+id/llInstagram"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
+                            android:layout_weight="1"
                             android:orientation="vertical"
-                            android:padding="16dp">
-                            <TextView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:background="@drawable/bg_unread_indicator"
-                                android:gravity="center"
-                                android:text="3"
-                                android:textColor="@color/white"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
+                            android:gravity="center"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="8dp">
+
                             <ImageView
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:layout_marginTop="12dp"
-                                android:src="@android:drawable/ic_menu_agenda"
-                                app:tint="@color/accent" />
+                                android:layout_width="52dp"
+                                android:layout_height="52dp"
+                                android:src="@drawable/ic_instagram"
+                                android:scaleType="fitCenter"
+                                android:contentDescription="Instagram"/>
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="@string/start_learning"
-                                android:textColor="@color/primary"
-                                android:textStyle="bold"
-                                android:textSize="12sp" />
+                                android:text="Instagram"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="11sp"
+                                android:layout_marginTop="6dp"/>
                         </LinearLayout>
-                    </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardReportProblem"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="12dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:text="⚠️ Report a Problem"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ABOUT US SECTION COMPACT -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardAboutUs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="About UniAssist"
+                        android:textColor="@color/primary"
+                        android:textStyle="bold"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:background="@drawable/bg_teal_circle"
+                        android:gravity="center"
+                        android:text="i"
+                        android:textColor="@color/surface"
+                        android:textStyle="bold"
+                        android:textSize="14sp"/>
 
                 </LinearLayout>
-            </HorizontalScrollView>
-
-            <TextView
-                android:id="@+id/tvLogout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="40dp"
-                android:padding="12dp"
-                android:text="@string/logout"
-                android:textColor="@color/error"
-                android:textSize="14sp" />
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
+
+    <!-- BOTTOM NAVIGATION -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/surface"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:labelVisibilityMode="labeled"
+        app:elevation="8dp"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

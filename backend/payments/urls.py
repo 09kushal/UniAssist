@@ -24,6 +24,7 @@ from payments.views import (
     PaymentStatusView,
     AdminPayoutReleaseView,
     TutorPayoutHistoryView,
+    DemoPaymentCompleteView,
 )
 
 app_name = 'payments'
@@ -31,6 +32,9 @@ app_name = 'payments'
 urlpatterns = [
     # ── Student payment initiation ────────────────────────────────────────────
     path('initiate/', InitiatePaymentView.as_view(), name='initiate'),
+
+    # ── Demo Payment (DEMO ONLY) ──────────────────────────────────────────────
+    path('demo-complete/', DemoPaymentCompleteView.as_view(), name='demo-complete'),
 
     # ── eSewa callback (no auth — called by eSewa server) ─────────────────────
     path('callback/', PaymentCallbackView.as_view(), name='callback'),

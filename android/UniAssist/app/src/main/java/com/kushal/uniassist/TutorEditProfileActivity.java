@@ -43,11 +43,13 @@ import com.kushal.uniassist.models.SubjectRequest;
 import com.kushal.uniassist.models.SubjectResponse;
 import com.kushal.uniassist.models.TutorProfileRequest;
 import com.kushal.uniassist.models.TutorResponse;
+import com.kushal.uniassist.models.TutorDocument;
 import com.kushal.uniassist.network.ApiClient;
 import com.kushal.uniassist.network.ApiService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -63,15 +65,19 @@ public class TutorEditProfileActivity extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE_PICK = 100;
     private static final int REQUEST_IMAGE_PERMISSION = 101;
+    private static final int REQUEST_DOC_PICK = 102;
 
     private ImageView ivBack, ivProfile;
     private View rlPhoto;
     private EditText etBio, etPricing;
     private Chip chipDomain;
     private ChipGroup chipGroupSubjects, chipGroupSkills;
-    private LinearLayout llAvailabilityList, llSubjectsSection, llSkillsSection;
-    private Button btnAddSubject, btnAddSkill, btnAddAvailability, btnSave;
+    private LinearLayout llAvailabilityList, llSubjectsSection, llSkillsSection, llDocumentList;
+    private Button btnAddSubject, btnAddSkill, btnAddAvailability, btnSave, btnUploadDocument;
     private ProgressBar progressBar;
+    private Spinner spinnerDocType;
+    private String[] docTypeValues = {"certificate", "marksheet", "citizenship", "portfolio", "skill_certificate"};
+    private String[] docTypeDisplay = {"Certificate", "Marksheet", "Citizenship", "Portfolio", "Skill Certificate"};
 
     private ApiService apiService;
     private SessionManager sessionManager;
@@ -109,6 +115,13 @@ public class TutorEditProfileActivity extends AppCompatActivity {
         btnAddAvailability = findViewById(R.id.btnAddAvailability);
         btnSave = findViewById(R.id.btnSave);
         progressBar = findViewById(R.id.progressBar);
+        spinnerDocType = findViewById(R.id.spinnerDocType);
+        btnUploadDocument = findViewById(R.id.btnUploadDocument);
+        llDocumentList = findViewById(R.id.llDocumentList);
+
+        if (spinnerDocType != null) {
+            spinnerDocType.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, docTypeDisplay));
+        }
 
         ivBack.setOnClickListener(v -> finish());
         rlPhoto.setOnClickListener(v -> checkPermissionsAndPickImage());
@@ -116,8 +129,12 @@ public class TutorEditProfileActivity extends AppCompatActivity {
         btnAddSkill.setOnClickListener(v -> showAddSkillDialog());
         btnAddAvailability.setOnClickListener(v -> showAddAvailabilityDialog());
         btnSave.setOnClickListener(v -> saveProfile());
+        if (btnUploadDocument != null) {
+            btnUploadDocument.setOnClickListener(v -> openDocPicker());
+        }
 
         loadProfile();
+        loadDocuments();
     }
 
     private void loadProfile() {
@@ -245,6 +262,9 @@ public class TutorEditProfileActivity extends AppCompatActivity {
             Log.d("TutorEdit", "Image selected: " + selectedImageUri);
             Glide.with(this).load(selectedImageUri).circleCrop().into(ivProfile);
             Toast.makeText(this, "Photo selected. Will be uploaded on save.", Toast.LENGTH_SHORT).show();
+        } else if (requestCode == REQUEST_DOC_PICK && resultCode == RESULT_OK && data != null) {
+            Uri docUri = data.getData();
+            uploadDocument(docUri);
         }
     }
 
@@ -524,5 +544,83 @@ public class TutorEditProfileActivity extends AppCompatActivity {
     private void showLoading(boolean loading) {
         progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
         btnSave.setEnabled(!loading);
+    }
+
+    private void loadDocuments() {
+        String authHeader = "Bearer " + sessionManager.getAccessToken();
+        apiService.getTutorDocuments(authHeader).enqueue(new Callback<ApiResponse<List<TutorDocument>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<TutorDocument>>> call, Response<ApiResponse<List<TutorDocument>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    updateDocumentList(response.body().getData());
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<List<TutorDocument>>> call, Throwable t) {}
+        });
+    }
+
+    private void updateDocumentList(List<TutorDocument> docs) {
+        if (llDocumentList == null) return;
+        llDocumentList.removeAllViews();
+        for (TutorDocument doc : docs) {
+            TextView tv = new TextView(this);
+            tv.setText(doc.getDocType() + " - " + doc.getUploadedAt());
+            tv.setPadding(0, 8, 0, 8);
+            llDocumentList.addView(tv);
+        }
+    }
+
+    private void openDocPicker() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        String[] mimetypes = {"image/*", "application/pdf"};
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
+        startActivityForResult(intent, REQUEST_DOC_PICK);
+    }
+
+    private void uploadDocument(Uri docUri) {
+        showLoading(true);
+        String authHeader = "Bearer " + sessionManager.getAccessToken();
+        int selectedIndex = spinnerDocType.getSelectedItemPosition();
+        String selectedDocType = docTypeValues[selectedIndex];
+
+        try {
+            InputStream is = getContentResolver().openInputStream(docUri);
+            byte[] bytes = new byte[is.available()];
+            is.read(bytes);
+            is.close();
+
+            String mimeType = getContentResolver().getType(docUri);
+            if (mimeType == null) mimeType = "application/pdf";
+            String ext = mimeType.contains("image") ? ".jpg" : ".pdf";
+
+            RequestBody requestFile = RequestBody.create(MediaType.parse(mimeType), bytes);
+            MultipartBody.Part filePart = MultipartBody.Part.createFormData("file_path", "doc" + ext, requestFile);
+            RequestBody docTypeBody = RequestBody.create(MediaType.parse("text/plain"), selectedDocType);
+
+            apiService.uploadTutorDocument(authHeader, docTypeBody, filePart).enqueue(new Callback<ApiResponse<TutorDocument>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<TutorDocument>> call, Response<ApiResponse<TutorDocument>> response) {
+                    showLoading(false);
+                    if (response.isSuccessful()) {
+                        Toast.makeText(TutorEditProfileActivity.this, "Document uploaded", Toast.LENGTH_SHORT).show();
+                        loadDocuments();
+                    } else {
+                        Toast.makeText(TutorEditProfileActivity.this, "Upload failed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<TutorDocument>> call, Throwable t) {
+                    showLoading(false);
+                    Toast.makeText(TutorEditProfileActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } catch (Exception e) {
+            showLoading(false);
+            e.printStackTrace();
+            Toast.makeText(this, "Error processing file", Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.kushal.uniassist;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,16 +84,42 @@ public class TutorBookingAdapter extends RecyclerView.Adapter<TutorBookingAdapte
                 tvStudentName.setText("Unknown Student");
             }
 
-            tvStatus.setText(booking.getBookingStatus());
-            tvSubject.setText(booking.getSubjectOrSkill());
+            String status = booking.getBookingStatus().toLowerCase();
+            tvStatus.setText(status);
+            
+            // Fix status chip colors
+            int color;
+            switch (status) {
+                case "accepted":
+                    color = Color.parseColor("#22C55E");
+                    break;
+                case "rejected":
+                    color = Color.parseColor("#EF4444");
+                    break;
+                case "pending":
+                default:
+                    color = Color.parseColor("#F59E0B");
+                    break;
+            }
+            tvStatus.setBackgroundTintList(ColorStateList.valueOf(color));
+            tvStatus.setTextColor(Color.WHITE);
+
+            // Fix subject chip
+            String subject = booking.getSubjectOrSkill();
+            if (subject != null && !subject.isEmpty()) {
+                tvSubject.setText(subject);
+                tvSubject.setVisibility(View.VISIBLE);
+            } else {
+                tvSubject.setVisibility(View.GONE);
+            }
+
             tvDateTime.setText(booking.getProposedDate() + " • " + booking.getProposedStartTime());
             tvMessage.setText(booking.getMessage());
 
-            String status = booking.getBookingStatus();
-            if ("pending".equalsIgnoreCase(status)) {
+            if ("pending".equals(status)) {
                 layoutActions.setVisibility(View.VISIBLE);
                 btnJoin.setVisibility(View.GONE);
-            } else if ("accepted".equalsIgnoreCase(status)) {
+            } else if ("accepted".equals(status)) {
                 layoutActions.setVisibility(View.GONE);
                 btnJoin.setVisibility(View.VISIBLE);
             } else {

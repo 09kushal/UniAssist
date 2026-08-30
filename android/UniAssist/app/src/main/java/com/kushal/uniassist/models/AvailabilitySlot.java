@@ -14,9 +14,15 @@ public class AvailabilitySlot {
     
     @SerializedName("end_time")
     private String endTime;
-
+    
     public int getId() { return id; }
-    public String getDayOfWeek() { return dayOfWeek; }
-    public String getStartTime() { return startTime; }
-    public String getEndTime() { return endTime; }
+    public String getDayOfWeek() { 
+        return dayOfWeek != null ? dayOfWeek : ""; 
+    }
+    public String getStartTime() { 
+        return startTime != null ? startTime : ""; 
+    }
+    public String getEndTime() { 
+        return endTime != null ? endTime : ""; 
+    }
 }

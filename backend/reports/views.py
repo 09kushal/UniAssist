@@ -37,7 +37,7 @@ from decimal import Decimal
 
 from django.core.mail import send_mail
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.conf import settings
 
 from rest_framework import status
@@ -923,3 +923,44 @@ class AdminRejectTutorView(APIView):
             {'success': True, 'message': 'Tutor rejected and notified via email.'},
             status=status.HTTP_200_OK,
         )
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 14. My Reports List (Student/Tutor)
+# GET /api/reports/my-reports/
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class MyReportsView(APIView):
+    """
+    GET /api/reports/my-reports/
+    Auth: Any authenticated user (Student or Tutor)
+    Returns reports filed by or against the user, and related reschedule requests.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        # 1. Lateness Reports (Reporter or Reported against)
+        lateness_qs = LatenessReport.objects.filter(
+            Q(reported_by=user) | Q(reported_against=user)
+        ).select_related('session__booking', 'reported_by', 'reported_against').order_by('-created_at')
+
+        # 2. Reschedule Requests (Requester or party to the booking)
+        reschedule_qs = RescheduleRequest.objects.filter(
+            Q(requested_by__user=user) |
+            Q(booking__student__user=user) |
+            Q(booking__tutor__user=user)
+        ).distinct().select_related('booking', 'requested_by__user').order_by('-created_at')
+
+        lateness_data = LatenessReportSerializer(lateness_qs, many=True).data
+        reschedule_data = RescheduleRequestSerializer(reschedule_qs, many=True).data
+
+        return Response({
+            'success': True,
+            'message': 'Reports retrieved successfully.',
+            'data': {
+                'lateness_reports': lateness_data,
+                'reschedule_requests': reschedule_data
+            }
+        }, status=status.HTTP_200_OK)

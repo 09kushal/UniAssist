@@ -180,11 +180,18 @@ class BookingRespondView(APIView):
 
         serializer = BookingRespondSerializer(data=request.data)
         if not serializer.is_valid():
-            first_error = next(iter(serializer.errors.values()))
-            if isinstance(first_error, list):
-                first_error = first_error[0]
+            logger.error('BookingRespondView validation failed: %s', serializer.errors)
+            try:
+                first_error = next(iter(serializer.errors.values()))
+                if isinstance(first_error, list):
+                    message = str(first_error[0])
+                else:
+                    message = str(first_error)
+            except (StopIteration, IndexError):
+                message = 'Invalid action.'
+
             return error_response(
-                message=str(first_error),
+                message=message,
                 errors=serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -445,4 +452,127 @@ class CancelBookingView(APIView):
         return success_response(
             message='Booking cancelled successfully.',
             data=resp_serializer.data,
+        )
+
+
+# ─── 7. Jitsi Join Token API ──────────────────────────────────────────────────
+
+class JitsiJoinTokenView(APIView):
+    """
+    POST /api/booking/<id>/join-token/
+    Auth: Authenticated user (Student or Tutor involved).
+
+    Validates booking, officially_scheduled flag, and session time.
+    Returns JaaS JWT token, room string, and server_url for Jitsi Meet.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, booking_id):
+        try:
+            booking = Booking.objects.select_related('student__user', 'tutor__user').get(id=booking_id)
+        except Booking.DoesNotExist:
+            return error_response(
+                message='Booking not found.',
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Authorize User
+        user_id = request.user.id
+        if user_id != booking.student.user_id and user_id != booking.tutor.user_id:
+            return error_response(
+                message='Not authorized for this booking.',
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Check Payment / Scheduled
+        if not booking.officially_scheduled:
+            return error_response(
+                message='Payment not completed.',
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Fetch latest session
+        session = booking.sessions.order_by('-created_at').first()
+        if not session:
+            return error_response(
+                message='Session not found for this booking.',
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Time gating check: allowed up to 10 minutes before
+        from django.utils import timezone
+        now = timezone.now()
+        import datetime
+        if session.scheduled_at is None:
+            return error_response(
+                message='Session time not yet set for this booking.',
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if now < session.scheduled_at - datetime.timedelta(minutes=10):
+            return error_response(
+                message='Too early to join. You can join 10 minutes before start.',
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Determine moderator
+        is_moderator = (user_id == booking.tutor.user_id)
+
+        # Room string
+        room_name = f"uniassist-session-{booking.id}"
+
+        # Generate JWT
+        import jwt
+        from django.conf import settings
+        import time
+        import os
+
+        # Check for key setup
+        app_id = getattr(settings, 'JAAS_APP_ID', '')
+        api_key_id = getattr(settings, 'JAAS_API_KEY_ID', '')
+        private_key_path = getattr(settings, 'JAAS_PRIVATE_KEY_PATH', '')
+
+        if not app_id or not api_key_id or not private_key_path:
+            return error_response(
+                message='JaaS server configuration is missing.',
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        if not os.path.exists(private_key_path):
+            return error_response(
+                message='JaaS private key not found on server.',
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        with open(private_key_path, 'r') as key_file:
+            private_key = key_file.read()
+
+        current_timestamp = int(time.time())
+        exp = current_timestamp + 3600
+        nbf = current_timestamp - 10
+
+        payload = {
+            "aud": "jitsi",
+            "iss": "chat",
+            "sub": app_id,
+            "room": room_name,
+            "exp": exp,
+            "nbf": nbf,
+            "context": {
+                "user": {
+                    "id": str(user_id),
+                    "name": request.user.full_name,
+                    "moderator": is_moderator
+                }
+            }
+        }
+
+        token = jwt.encode(payload, private_key, algorithm="RS256", headers={"kid": api_key_id})
+
+        return success_response(
+            message='Join token generated successfully.',
+            data={
+                "token": token,
+                "room": f"{app_id}/{room_name}",
+                "server_url": "https://8x8.vc"
+            }
         )

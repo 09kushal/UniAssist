@@ -137,15 +137,38 @@ class BookingRequestSerializer(serializers.Serializer):
                 'proposed_start_time': 'Proposed start time must be earlier than end time.'
             })
 
-        # Also validate if today is selected, start time must not be in the past.
-        # However, let's keep it simple or strictly enforce:
+        # Minimum-time-remaining validation for same-day bookings
         proposed_date = attrs.get('proposed_date')
         if proposed_date == timezone.localdate():
-            current_time = timezone.localtime().time()
-            if start < current_time:
+            now_time = timezone.localtime().time()
+            import datetime
+            minutes_remaining = (
+                datetime.datetime.combine(timezone.localdate(), end) -
+                datetime.datetime.combine(timezone.localdate(), now_time)
+            ).total_seconds() / 60
+
+            if minutes_remaining < 15:
                 raise serializers.ValidationError({
-                    'proposed_start_time': 'Proposed start time cannot be in the past for today.'
+                    'proposed_start_time': 'Not enough time remains in this slot to complete booking, payment, and join.'
                 })
+
+        # Double booking check
+        from django.db.models import Q
+        tutor_id = attrs.get('tutor_id')
+        overlapping = Booking.objects.filter(
+            tutor_id=tutor_id,
+            proposed_date=proposed_date
+        ).filter(
+            Q(booking_status__in=['pending', 'accepted']) | Q(officially_scheduled=True)
+        ).filter(
+            proposed_start_time__lt=end,
+            proposed_end_time__gt=start
+        )
+
+        if overlapping.exists():
+            raise serializers.ValidationError({
+                'proposed_start_time': 'This slot is already booked or has a pending request.'
+            })
 
         return attrs
 
@@ -164,6 +187,7 @@ class BookingRespondSerializer(serializers.Serializer):
         max_length=1000,
         required=False,
         allow_blank=True,
+        allow_null=True,
         default='',
     )
 

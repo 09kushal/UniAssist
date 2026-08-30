@@ -7,14 +7,19 @@ import com.kushal.uniassist.models.BookingActionRequest;
 import com.kushal.uniassist.models.PaginatedResponse;
 import com.kushal.uniassist.models.BookingRequest;
 import com.kushal.uniassist.models.BookingResponse;
+import com.kushal.uniassist.models.JoinTokenResponse;
+import com.kushal.uniassist.models.LatenessReportResponse;
 import com.kushal.uniassist.models.LoginRequest;
 import com.kushal.uniassist.models.LoginResponse;
+import com.kushal.uniassist.models.MyReportsResponse;
 import com.kushal.uniassist.models.NotificationPaginatedResponse;
 import com.kushal.uniassist.models.NotificationResponse;
 import com.kushal.uniassist.models.OtpVerifyRequest;
 import com.kushal.uniassist.models.OtpVerifyResponse;
+import com.kushal.uniassist.models.PaginatedResponse;
 import com.kushal.uniassist.models.PaymentInitiateRequest;
 import com.kushal.uniassist.models.PaymentInitiateResponse;
+import com.kushal.uniassist.models.PayoutResponse;
 import com.kushal.uniassist.models.RegisterRequest;
 import com.kushal.uniassist.models.RegisterResponse;
 import com.kushal.uniassist.models.SkillRequest;
@@ -25,6 +30,8 @@ import com.kushal.uniassist.models.SubjectResponse;
 import com.kushal.uniassist.models.TutorProfileRequest;
 import com.kushal.uniassist.models.TutorRegisterRequest;
 import com.kushal.uniassist.models.TutorResponse;
+import com.kushal.uniassist.models.TutorDocument;
+import com.kushal.uniassist.models.UnreadCountResponse;
 
 import java.util.List;
 
@@ -58,10 +65,22 @@ public interface ApiService {
 
     @Multipart
     @PATCH("api/auth/student/profile/setup/")
-    Call<StudentProfileResponse> updateStudentProfile(
+    Call<ApiResponse<StudentProfileResponse>> updateStudentProfile(
             @Header("Authorization") String authHeader,
             @Part("grade_or_university") RequestBody gradeOrUniversity,
-            @Part("subjects_of_interest") RequestBody subjectsOfInterest
+            @Part("subjects_of_interest") RequestBody subjectsOfInterest,
+            @Part MultipartBody.Part profilePhoto
+    );
+
+    @PATCH("api/auth/student/profile/setup/")
+    Call<ApiResponse<StudentProfileResponse>> updateStudentProfile(
+            @Header("Authorization") String token,
+            @Body com.kushal.uniassist.models.StudentProfileRequest request
+    );
+
+    @GET("api/auth/student/profile/")
+    Call<ApiResponse<StudentProfileResponse>> getStudentProfile(
+            @Header("Authorization") String authHeader
     );
 
     // Tutor Endpoints
@@ -96,6 +115,19 @@ public interface ApiService {
             @Part("bio") RequestBody bio,
             @Part("pricing_per_session") RequestBody pricing,
             @Part MultipartBody.Part photo
+    );
+
+    @Multipart
+    @POST("api/tutors/documents/upload/")
+    Call<ApiResponse<TutorDocument>> uploadTutorDocument(
+            @Header("Authorization") String token,
+            @Part("doc_type") RequestBody docType,
+            @Part MultipartBody.Part file
+    );
+
+    @GET("api/tutors/documents/")
+    Call<ApiResponse<List<TutorDocument>>> getTutorDocuments(
+            @Header("Authorization") String token
     );
 
     @POST("api/tutors/subjects/add/")
@@ -161,6 +193,61 @@ public interface ApiService {
             @Body BookingActionRequest request
     );
 
+    @POST("api/booking/{id}/join-token/")
+    Call<ApiResponse<JoinTokenResponse>> getJoinToken(
+            @Header("Authorization") String token,
+            @Path("id") int bookingId
+    );
+
+    @GET("api/payments/tutor/payouts/")
+    Call<ApiResponse<PaginatedResponse<PayoutResponse>>> getPayoutHistory(
+            @Header("Authorization") String token,
+            @Query("page") int page
+    );
+
+    // Report Endpoints
+    @GET("api/reports/my-reports/")
+    Call<ApiResponse<MyReportsResponse>> getMyReports(
+            @Header("Authorization") String token
+    );
+
+    @POST("api/reports/lateness/file/")
+    Call<ApiResponse<Object>> fileLatenessReport(
+            @Header("Authorization") String token,
+            @Body RequestBody reportData
+    );
+
+    @POST("api/reports/student/file/")
+    Call<ApiResponse<Object>> fileStudentReport(
+            @Header("Authorization") String token,
+            @Body RequestBody reportData
+    );
+
+    @POST("api/reports/reschedule/request/")
+    Call<ApiResponse<Object>> requestReschedule(
+            @Header("Authorization") String token,
+            @Body RequestBody requestData
+    );
+
+    // Review Endpoints
+    @POST("api/reviews/submit/")
+    Call<ApiResponse<Object>> submitReview(
+            @Header("Authorization") String token,
+            @Body com.kushal.uniassist.models.ReviewSubmitRequest request
+    );
+
+    @GET("api/reviews/check/{booking_id}/")
+    Call<ApiResponse<com.kushal.uniassist.models.ReviewCheckResponse>> checkReview(
+            @Header("Authorization") String token,
+            @Path("booking_id") int bookingId
+    );
+
+    @GET("api/reviews/tutor/{tutor_id}/")
+    Call<ApiResponse<com.kushal.uniassist.models.TutorReviewsResponse>> getTutorReviews(
+            @Path("tutor_id") int tutorId,
+            @Query("page") int page
+    );
+
     // Notification Endpoints
     @GET("api/notifications/")
     Call<ApiResponse<NotificationPaginatedResponse>> getNotifications(
@@ -180,13 +267,19 @@ public interface ApiService {
     );
 
     @GET("api/notifications/unread-count/")
-    Call<ApiResponse<Integer>> getUnreadNotificationCount(
+    Call<ApiResponse<UnreadCountResponse>> getUnreadCount(
             @Header("Authorization") String authHeader
     );
 
     // Payment Endpoints
     @POST("api/payments/initiate/")
     Call<ApiResponse<PaymentInitiateResponse>> initiatePayment(
+            @Header("Authorization") String token,
+            @Body PaymentInitiateRequest request
+    );
+
+    @POST("api/payments/demo-complete/")
+    Call<ApiResponse<Object>> demoCompletePayment(
             @Header("Authorization") String token,
             @Body PaymentInitiateRequest request
     );

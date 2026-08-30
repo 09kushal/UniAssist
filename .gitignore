@@ -9,3 +9,4 @@ db.sqlite3
 docs/
 .env
 backend/firebase_credentials.json
+backend/jaas_private.pk

@@ -1,25 +1,26 @@
 package com.kushal.uniassist.models;
 
+import com.google.gson.annotations.SerializedName;
+
 public class StudentProfileResponse {
-    private boolean success;
-    private String message;
-    private Data data;
+    @SerializedName("id")
+    private int id;
+    
+    @SerializedName("full_name")
+    private String fullName;
+    
+    @SerializedName("grade_or_university")
+    private String gradeOrUniversity;
+    
+    @SerializedName("subjects_of_interest")
+    private String subjectsOfInterest;
+    
+    @SerializedName("profile_photo_url")
+    private String profilePhotoUrl;
 
-    public static class Data {
-        private int id;
-        private String full_name;
-        private String grade_or_university;
-        private String subjects_of_interest;
-        private String profile_photo_url;
-
-        public int getId() { return id; }
-        public String getFullName() { return full_name; }
-        public String getGradeOrUniversity() { return grade_or_university; }
-        public String getSubjectsOfInterest() { return subjects_of_interest; }
-        public String getProfilePhotoUrl() { return profile_photo_url; }
-    }
-
-    public boolean isSuccess() { return success; }
-    public String getMessage() { return message; }
-    public Data getData() { return data; }
+    public int getId() { return id; }
+    public String getFullName() { return fullName != null ? fullName : ""; }
+    public String getGradeOrUniversity() { return gradeOrUniversity != null ? gradeOrUniversity : ""; }
+    public String getSubjectsOfInterest() { return subjectsOfInterest != null ? subjectsOfInterest : ""; }
+    public String getProfilePhotoUrl() { return profilePhotoUrl; }
 }

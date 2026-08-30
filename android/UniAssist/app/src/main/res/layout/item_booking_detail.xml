@@ -138,6 +138,64 @@
                 android:text="Join Session"
                 android:textColor="@color/white"
                 android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/btnDemoPayment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Demo: Mark Paid"
+                android:textColor="#F59E0B"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                app:strokeColor="#F59E0B"
+                android:visibility="gone"
+                android:stateListAnimator="@null"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llReportReschedule"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvReport"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Report Lateness"
+                android:textColor="@color/error"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:padding="8dp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:background="#DDDDDD" />
+
+            <TextView
+                android:id="@+id/tvReschedule"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Request Reschedule"
+                android:textColor="@color/accent"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:padding="8dp"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"/>
         </LinearLayout>
 
     </LinearLayout>

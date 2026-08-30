@@ -38,6 +38,7 @@ urlpatterns = [
     path('password-reset/confirm/', views.PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
 
     # Student Profile
+    path('student/profile/',        views.StudentProfileSetupView.as_view(),  name='student-profile'),
     path('student/profile/setup/',  views.StudentProfileSetupView.as_view(),  name='student-profile-setup'),
 
     # Device Token

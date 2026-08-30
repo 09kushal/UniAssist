@@ -51,7 +51,8 @@
             android:paddingVertical="4dp"
             android:text="Subject"
             android:textColor="@color/accent"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvDateTime"

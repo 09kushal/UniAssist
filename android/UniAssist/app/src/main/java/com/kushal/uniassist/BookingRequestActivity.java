@@ -3,6 +3,7 @@ package com.kushal.uniassist;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -27,13 +28,16 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 import com.kushal.uniassist.models.ApiResponse;
+import com.kushal.uniassist.models.AvailabilitySlot;
 import com.kushal.uniassist.models.BookingRequest;
 import com.kushal.uniassist.models.BookingResponse;
 import com.kushal.uniassist.models.TutorResponse;
 import com.kushal.uniassist.network.ApiClient;
 import com.kushal.uniassist.network.ApiService;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
@@ -43,17 +47,22 @@ import retrofit2.Response;
 public class BookingRequestActivity extends AppCompatActivity {
 
     private EditText etSubjectOrSkill, etMessage;
-    private TextView tvTutorName, tvPriceLabel, tvSelectedDate, tvStartTime, tvEndTime;
+    private TextView tvTutorName, tvPriceLabel, tvSelectedDate, tvNoSlots;
     private ImageView ivBack;
-    private LinearLayout llSelectDate, llSelectStartTime, llSelectEndTime;
+    private LinearLayout llSelectDate, llAvailabilitySlots;
     private Button btnSendRequest;
     private ProgressBar progressBar;
     private SessionManager sessionManager;
+    private ApiService apiService;
     private int tutorId;
 
     private String selectedDate = "";
     private String selectedStartTime = "09:00:00";
     private String selectedEndTime = "11:00:00";
+    
+    private int targetDayOfWeek = -1;
+    private AvailabilitySlot selectedSlot = null;
+    private List<AvailabilitySlot> availabilitySlots = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +83,7 @@ public class BookingRequestActivity extends AppCompatActivity {
         });
 
         sessionManager = new SessionManager(this);
+        apiService = ApiClient.getClient().create(ApiService.class);
         tutorId = getIntent().getIntExtra("tutor_id", -1);
 
         if (tutorId == -1) {
@@ -89,22 +99,95 @@ public class BookingRequestActivity extends AppCompatActivity {
         etSubjectOrSkill = findViewById(R.id.etSubjectOrSkill);
         etMessage = findViewById(R.id.etMessage);
         tvSelectedDate = findViewById(R.id.tvSelectedDate);
-        tvStartTime = findViewById(R.id.tvStartTime);
-        tvEndTime = findViewById(R.id.tvEndTime);
         
         llSelectDate = findViewById(R.id.llSelectDate);
-        llSelectStartTime = findViewById(R.id.llSelectStartTime);
-        llSelectEndTime = findViewById(R.id.llSelectEndTime);
+        llAvailabilitySlots = findViewById(R.id.llAvailabilitySlots);
+        tvNoSlots = findViewById(R.id.tvNoSlots);
         btnSendRequest = findViewById(R.id.btnSendRequest);
         progressBar = findViewById(R.id.progressBar);
 
         if (ivBack != null) ivBack.setOnClickListener(v -> finish());
         if (llSelectDate != null) llSelectDate.setOnClickListener(v -> showDatePicker());
-        if (llSelectStartTime != null) llSelectStartTime.setOnClickListener(v -> showTimePicker(true));
-        if (llSelectEndTime != null) llSelectEndTime.setOnClickListener(v -> showTimePicker(false));
         if (btnSendRequest != null) btnSendRequest.setOnClickListener(v -> sendBookingRequest());
 
         setupTutorInfo();
+        loadTutorAvailability();
+    }
+
+    private void loadTutorAvailability() {
+        String token = "Bearer " + sessionManager.getAccessToken();
+
+        apiService.getTutorProfile(token, tutorId).enqueue(new Callback<ApiResponse<TutorResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<TutorResponse>> call, Response<ApiResponse<TutorResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    TutorResponse tutor = response.body().getData();
+                    availabilitySlots = tutor.getAvailabilitySlots();
+
+                    if (availabilitySlots != null && !availabilitySlots.isEmpty()) {
+                        showAvailabilitySlots(availabilitySlots);
+                    } else {
+                        targetDayOfWeek = -1;
+                        tvNoSlots.setVisibility(View.VISIBLE);
+                        tvNoSlots.setText("Tutor hasn't set availability yet.\nYou can still propose a time.");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<TutorResponse>> call, Throwable t) {
+                Log.e("Booking", "Failed to load availability");
+            }
+        });
+    }
+
+    private void showAvailabilitySlots(List<AvailabilitySlot> slots) {
+        llAvailabilitySlots.removeAllViews();
+
+        for (AvailabilitySlot slot : slots) {
+            TextView chip = new TextView(this);
+
+            String slotText = slot.getDayOfWeek() + " " +
+                    (slot.getStartTime().length() >= 5 ? slot.getStartTime().substring(0, 5) : slot.getStartTime()) +
+                    "-" +
+                    (slot.getEndTime().length() >= 5 ? slot.getEndTime().substring(0, 5) : slot.getEndTime());
+
+            chip.setText(slotText);
+            chip.setPadding(24, 12, 24, 12);
+            chip.setBackgroundResource(R.drawable.bg_chip_unselected);
+            chip.setTextColor(ContextCompat.getColor(this, R.color.accent));
+            chip.setTextSize(13f);
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 0, 8, 0);
+            chip.setLayoutParams(params);
+
+            chip.setOnClickListener(v -> {
+                // Reset all chips
+                for (int i = 0; i < llAvailabilitySlots.getChildCount(); i++) {
+                    View child = llAvailabilitySlots.getChildAt(i);
+                    child.setBackgroundResource(R.drawable.bg_chip_unselected);
+                    ((TextView) child).setTextColor(ContextCompat.getColor(this, R.color.accent));
+                }
+
+                // Highlight selected chip
+                chip.setBackgroundResource(R.drawable.bg_chip_selected);
+                chip.setTextColor(Color.WHITE);
+
+                // Auto fill times
+                selectedSlot = slot;
+                selectedStartTime = slot.getStartTime();
+                selectedEndTime = slot.getEndTime();
+                
+                restrictDatePickerToDay(slot.getDayOfWeek());
+
+                Toast.makeText(this, "Selected: " + slotText + "\nPick a " + slot.getDayOfWeek() + " date", Toast.LENGTH_SHORT).show();
+            });
+
+            llAvailabilitySlots.addView(chip);
+        }
     }
 
     private void setupTutorInfo() {
@@ -136,41 +219,102 @@ public class BookingRequestActivity extends AppCompatActivity {
         }
     }
 
-    private void showDatePicker() {
-        Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
+    private void restrictDatePickerToDay(String dayOfWeek) {
+        // Convert day abbreviation to Calendar constant
+        int targetDay;
+        switch (dayOfWeek) {
+            case "Mon": targetDay = Calendar.MONDAY; break;
+            case "Tue": targetDay = Calendar.TUESDAY; break;
+            case "Wed": targetDay = Calendar.WEDNESDAY; break;
+            case "Thu": targetDay = Calendar.THURSDAY; break;
+            case "Fri": targetDay = Calendar.FRIDAY; break;
+            case "Sat": targetDay = Calendar.SATURDAY; break;
+            case "Sun": targetDay = Calendar.SUNDAY; break;
+            default: targetDay = -1;
+        }
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year1, month1, dayOfMonth) -> {
-            selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year1, month1 + 1, dayOfMonth);
-            if (tvSelectedDate != null) tvSelectedDate.setText(selectedDate);
-        }, year, month, day);
+        this.targetDayOfWeek = targetDay;
+
+        // Find next occurrence of that day
+        Calendar nextOccurrence = Calendar.getInstance();
         
-        Calendar tomorrow = Calendar.getInstance();
-        tomorrow.add(Calendar.DAY_OF_MONTH, 1);
-        datePickerDialog.getDatePicker().setMinDate(tomorrow.getTimeInMillis());
-        
-        datePickerDialog.show();
+        boolean canSelectToday = false;
+        if (nextOccurrence.get(Calendar.DAY_OF_WEEK) == targetDay) {
+            try {
+                String[] parts = selectedStartTime.split(":");
+                int hour = Integer.parseInt(parts[0]);
+                int min = Integer.parseInt(parts[1]);
+                Calendar slotTime = Calendar.getInstance();
+                slotTime.set(Calendar.HOUR_OF_DAY, hour);
+                slotTime.set(Calendar.MINUTE, min);
+                if (slotTime.after(nextOccurrence)) {
+                    canSelectToday = true;
+                }
+            } catch (Exception e) {}
+        }
+
+        if (!canSelectToday) {
+            nextOccurrence.add(Calendar.DAY_OF_MONTH, 1);
+            while (nextOccurrence.get(Calendar.DAY_OF_WEEK) != targetDay) {
+                nextOccurrence.add(Calendar.DAY_OF_MONTH, 1);
+            }
+        }
+
+        // Update date field to show next valid date
+        selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d",
+                nextOccurrence.get(Calendar.YEAR),
+                nextOccurrence.get(Calendar.MONTH) + 1,
+                nextOccurrence.get(Calendar.DAY_OF_MONTH));
+
+        if (tvSelectedDate != null) {
+            tvSelectedDate.setText(selectedDate);
+        }
+
+        Toast.makeText(this, "Date auto-set to next " + dayOfWeek + ". Tap date to change.", Toast.LENGTH_SHORT).show();
     }
 
-    private void showTimePicker(boolean isStart) {
-        Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE);
+    private void showDatePicker() {
+        Calendar today = Calendar.getInstance();
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, (view, hourOfDay, minute1) -> {
-            String time = String.format(Locale.getDefault(), "%02d:%02d:00", hourOfDay, minute1);
-            String displayTime = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute1);
-            if (isStart) {
-                selectedStartTime = time;
-                if (tvStartTime != null) tvStartTime.setText(displayTime);
-            } else {
-                selectedEndTime = time;
-                if (tvEndTime != null) tvEndTime.setText(displayTime);
+        DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, day) -> {
+            // Validate selected day matches slot
+            Calendar selected = Calendar.getInstance();
+            selected.set(year, month, day);
+
+            if (targetDayOfWeek != -1 && selected.get(Calendar.DAY_OF_WEEK) != targetDayOfWeek) {
+                // Find day name for error message
+                String[] dayNames = {"", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+                String requiredDay = dayNames[targetDayOfWeek];
+
+                Toast.makeText(this, "Please select a " + requiredDay + " — tutor is only available on " + requiredDay + "s", Toast.LENGTH_LONG).show();
+                return;
             }
-        }, hour, minute, true);
-        timePickerDialog.show();
+
+            Calendar now = Calendar.getInstance();
+            if (year == now.get(Calendar.YEAR) && month == now.get(Calendar.MONTH) && day == now.get(Calendar.DAY_OF_MONTH)) {
+                try {
+                    String[] parts = selectedStartTime.split(":");
+                    int hour = Integer.parseInt(parts[0]);
+                    int min = Integer.parseInt(parts[1]);
+                    Calendar slotTime = Calendar.getInstance();
+                    slotTime.set(Calendar.HOUR_OF_DAY, hour);
+                    slotTime.set(Calendar.MINUTE, min);
+                    if (slotTime.before(now)) {
+                        Toast.makeText(this, "This time slot has already passed today. Please select a future date.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                } catch (Exception e) {}
+            }
+
+            selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, day);
+            if (tvSelectedDate != null) tvSelectedDate.setText(selectedDate);
+
+        }, today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_MONTH));
+
+        // Set minimum date to today
+        dialog.getDatePicker().setMinDate(today.getTimeInMillis());
+
+        dialog.show();
     }
 
     private void sendBookingRequest() {
@@ -182,42 +326,14 @@ public class BookingRequestActivity extends AppCompatActivity {
             return;
         }
 
-        // Time Validation
-        try {
-            String[] dateParts = selectedDate.split("-");
-            int year = Integer.parseInt(dateParts[0]);
-            int month = Integer.parseInt(dateParts[1]) - 1;
-            int day = Integer.parseInt(dateParts[2]);
-
-            String[] startParts = selectedStartTime.split(":");
-            int startHour = Integer.parseInt(startParts[0]);
-            int startMin = Integer.parseInt(startParts[1]);
-
-            String[] endParts = selectedEndTime.split(":");
-            int endHour = Integer.parseInt(endParts[0]);
-            int endMin = Integer.parseInt(endParts[1]);
-
-            Calendar now = Calendar.getInstance();
-            Calendar startCal = Calendar.getInstance();
-            startCal.set(year, month, day, startHour, startMin, 0);
-            startCal.set(Calendar.MILLISECOND, 0);
-
-            if (startCal.before(now)) {
-                Toast.makeText(this, "Please select a future time", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            Calendar endCal = Calendar.getInstance();
-            endCal.set(year, month, day, endHour, endMin, 0);
-            endCal.set(Calendar.MILLISECOND, 0);
-
-            if (!endCal.after(startCal)) {
-                Toast.makeText(this, "End time must be after start time", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        } catch (Exception e) {
-            Log.e("BookingDebug", "Validation error: " + e.getMessage());
+        if (selectedSlot == null && availabilitySlots != null && !availabilitySlots.isEmpty()) {
+            Toast.makeText(this, "Please select an available time slot", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        // Use selected slot times if available, otherwise defaults
+        String startTime = selectedSlot != null ? selectedSlot.getStartTime() : "09:00:00";
+        String endTime = selectedSlot != null ? selectedSlot.getEndTime() : "11:00:00";
 
         if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
         if (btnSendRequest != null) btnSendRequest.setEnabled(false);
@@ -240,8 +356,8 @@ public class BookingRequestActivity extends AppCompatActivity {
             Log.d("BookingDebug", "Tutor ID: " + tutorId);
             Log.d("BookingDebug", "Subject: " + subjectOrSkill);
             Log.d("BookingDebug", "Date: " + selectedDate);
-            Log.d("BookingDebug", "Start: " + selectedStartTime);
-            Log.d("BookingDebug", "End: " + selectedEndTime);
+            Log.d("BookingDebug", "Start: " + startTime);
+            Log.d("BookingDebug", "End: " + endTime);
             Log.d("BookingDebug", "Message: " + message);
             Log.d("BookingDebug", "Token exists: " + (sessionManager.getAccessToken() != null));
 
@@ -251,8 +367,8 @@ public class BookingRequestActivity extends AppCompatActivity {
                 tutorId, 
                 subjectOrSkill, 
                 selectedDate, 
-                selectedStartTime, 
-                selectedEndTime, 
+                startTime, 
+                endTime,
                 message
             );
 

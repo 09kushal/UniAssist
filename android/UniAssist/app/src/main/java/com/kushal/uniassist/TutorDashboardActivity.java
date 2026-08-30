@@ -24,6 +24,7 @@ import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.kushal.uniassist.models.ApiResponse;
 import com.kushal.uniassist.models.TutorResponse;
+import com.kushal.uniassist.models.UnreadCountResponse;
 import com.kushal.uniassist.network.ApiClient;
 import com.kushal.uniassist.network.ApiService;
 
@@ -33,8 +34,9 @@ import retrofit2.Response;
 
 public class TutorDashboardActivity extends AppCompatActivity {
 
-    private TextView tvWelcome, tvVerificationStatus, tvTotalSessions, tvTutorRating, tvEarnings;
+    private TextView tvWelcome, tvVerificationStatus, tvTotalSessions, tvTutorRating, tvEarnings, tvNotifBadge;
     private ImageView ivTutorAvatar;
+    private android.widget.ImageButton btnNotifications;
     private CardView cardBookings, cardProfile, cardPayouts, cardReports;
     private Button btnLogout;
     private SessionManager sessionManager;
@@ -73,6 +75,13 @@ public class TutorDashboardActivity extends AppCompatActivity {
         cardReports = findViewById(R.id.cardReports);
         btnLogout = findViewById(R.id.btnLogout);
 
+        btnNotifications = findViewById(R.id.btnNotifications);
+        tvNotifBadge = findViewById(R.id.tvNotifBadge);
+
+        btnNotifications.setOnClickListener(v -> {
+            startActivity(new Intent(this, NotificationsActivity.class));
+        });
+
         cardBookings.setOnClickListener(v -> startActivity(new Intent(this, TutorBookingsActivity.class)));
         cardProfile.setOnClickListener(v -> startActivity(new Intent(this, TutorEditProfileActivity.class)));
         cardPayouts.setOnClickListener(v -> startActivity(new Intent(this, PayoutActivity.class)));
@@ -91,6 +100,32 @@ public class TutorDashboardActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         fetchTutorProfile();
+        loadNotificationCount();
+    }
+
+    private void loadNotificationCount() {
+        String token = "Bearer " + sessionManager.getAccessToken();
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+
+        apiService.getUnreadCount(token).enqueue(new Callback<ApiResponse<UnreadCountResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<UnreadCountResponse>> call, Response<ApiResponse<UnreadCountResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    int count = response.body().getData().getUnreadCount();
+                    if (count > 0) {
+                        tvNotifBadge.setVisibility(View.VISIBLE);
+                        tvNotifBadge.setText(String.valueOf(count));
+                    } else {
+                        tvNotifBadge.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<UnreadCountResponse>> call, Throwable t) {
+                Log.e("TutorDash", "Notif count failed");
+            }
+        });
     }
 
     private void fetchTutorProfile() {

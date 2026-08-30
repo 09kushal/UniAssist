@@ -11,6 +11,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.chip.ChipGroup;
 import com.kushal.uniassist.models.ApiResponse;
@@ -54,6 +56,9 @@ public class TutorListActivity extends AppCompatActivity {
     private EditText etSearch;
     private ImageView ivBack;
     private SessionManager sessionManager;
+    private TextView tvResultCount;
+    private SwipeRefreshLayout swipeRefresh;
+    private LinearLayout emptyStateLayout;
     
     private int currentPage = 1;
     private int totalPages = 1;
@@ -91,12 +96,25 @@ public class TutorListActivity extends AppCompatActivity {
             chipGroupFilters = findViewById(R.id.chipGroupFilters);
             etSearch = findViewById(R.id.etSearch);
             ivBack = findViewById(R.id.ivBack);
+            tvResultCount = findViewById(R.id.tvResultCount);
+            swipeRefresh = findViewById(R.id.swipeRefresh);
+            emptyStateLayout = findViewById(R.id.emptyStateLayout);
 
             if (ivBack != null) ivBack.setOnClickListener(v -> finish());
+            
+            if (swipeRefresh != null) {
+                swipeRefresh.setOnRefreshListener(() -> loadTutors(true));
+            }
 
             String domainExtra = getIntent().getStringExtra("domain");
             if (domainExtra != null) {
                 currentDomain = domainExtra;
+            }
+            
+            String queryExtra = getIntent().getStringExtra("search_query");
+            if (queryExtra != null && !queryExtra.isEmpty()) {
+                searchQuery = queryExtra.toLowerCase().trim();
+                if (etSearch != null) etSearch.setText(queryExtra);
             }
 
             adapter = new TutorAdapter(new TutorAdapter.OnTutorClickListener() {
@@ -197,7 +215,14 @@ public class TutorListActivity extends AppCompatActivity {
             filteredTutors.addAll(filtered);
         }
         if (adapter != null) adapter.updateList(filteredTutors);
-        if (tvEmpty != null) tvEmpty.setVisibility(filteredTutors.isEmpty() ? View.VISIBLE : View.GONE);
+        
+        if (tvResultCount != null) {
+            tvResultCount.setText("Showing " + filteredTutors.size() + " tutor" + (filteredTutors.size() != 1 ? "s" : ""));
+        }
+        
+        boolean isEmpty = filteredTutors.isEmpty();
+        if (emptyStateLayout != null) emptyStateLayout.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        if (rvTutors != null) rvTutors.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
     }
 
     private void loadTutors(boolean refresh) {
@@ -229,6 +254,7 @@ public class TutorListActivity extends AppCompatActivity {
                 public void onResponse(Call<ApiResponse<PaginatedResponse<TutorResponse>>> call, Response<ApiResponse<PaginatedResponse<TutorResponse>>> response) {
                     isLoading = false;
                     if (progressBar != null) progressBar.setVisibility(View.GONE);
+                    if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
 
                     if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                         PaginatedResponse<TutorResponse> data = response.body().getData();
@@ -248,16 +274,17 @@ public class TutorListActivity extends AppCompatActivity {
                         
                         if (tutors != null && !tutors.isEmpty()) {
                             allTutors.addAll(tutors);
-                            if (tvEmpty != null) tvEmpty.setVisibility(View.GONE);
+                            if (emptyStateLayout != null) emptyStateLayout.setVisibility(View.GONE);
                             if (rvTutors != null) rvTutors.setVisibility(View.VISIBLE);
                             filterLocally();
                         } else {
                             if (refresh) {
-                                if (tvEmpty != null) {
-                                    tvEmpty.setVisibility(View.VISIBLE);
-                                    tvEmpty.setText("No tutors found");
+                                if (emptyStateLayout != null) {
+                                    emptyStateLayout.setVisibility(View.VISIBLE);
+                                    if (tvEmpty != null) tvEmpty.setText("No tutors found");
                                 }
                                 if (rvTutors != null) rvTutors.setVisibility(View.GONE);
+                                if (tvResultCount != null) tvResultCount.setText("Showing 0 tutors");
                             }
                         }
 
@@ -283,6 +310,7 @@ public class TutorListActivity extends AppCompatActivity {
                 public void onFailure(Call<ApiResponse<PaginatedResponse<TutorResponse>>> call, Throwable t) {
                     isLoading = false;
                     if (progressBar != null) progressBar.setVisibility(View.GONE);
+                    if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
                     if (currentPage == 1) {
                         Toast.makeText(TutorListActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
                     }

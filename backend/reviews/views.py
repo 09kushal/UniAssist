@@ -137,13 +137,10 @@ class SubmitReviewView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        # Booking must be completed before a review is allowed
-        if booking.booking_status != Booking.BookingStatus.COMPLETED:
+        # Booking must be paid (officially scheduled) before a review is allowed
+        if not booking.officially_scheduled:
             return error_response(
-                message=(
-                    'You can only review a completed session. '
-                    f'Current booking status: {booking.booking_status}.'
-                ),
+                message='You can only review a session that has been paid and scheduled.',
                 status=status.HTTP_400_BAD_REQUEST,
             )
 

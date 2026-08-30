@@ -182,3 +182,8 @@ ESEWA_PRODUCT_CODE = 'EPAYTEST'   # Sandbox product code
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
+
+# ─── JaaS / Jitsi Configuration ───────────────────────────────────────────────
+JAAS_APP_ID = os.getenv('JAAS_APP_ID')
+JAAS_API_KEY_ID = os.getenv('JAAS_API_KEY_ID')
+JAAS_PRIVATE_KEY_PATH = os.getenv('JAAS_PRIVATE_KEY_PATH')

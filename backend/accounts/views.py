@@ -574,6 +574,39 @@ class StudentProfileSetupView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        if not request.user.is_authenticated or not request.user.is_student:
+            return error_response(
+                message='Only students can access this endpoint.',
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        try:
+            student = request.user.student_profile
+        except Exception:
+            return error_response(
+                message='Student profile not found.',
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        profile_photo_url = None
+        if student.profile_photo:
+            try:
+                profile_photo_url = request.build_absolute_uri(student.profile_photo.url)
+            except Exception:
+                pass
+
+        return success_response(
+            message='Profile retrieved successfully.',
+            data={
+                'id':                   student.id,
+                'full_name':            student.user.full_name,
+                'grade_or_university':  student.grade_or_university,
+                'subjects_of_interest': student.subjects_of_interest,
+                'profile_photo_url':    profile_photo_url,
+            },
+        )
+
     def patch(self, request):
         if not request.user.is_authenticated or not request.user.is_student:
             return error_response(

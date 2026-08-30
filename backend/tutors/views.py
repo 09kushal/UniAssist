@@ -31,7 +31,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
-from accounts.models import Tutor, Subject, Skill, TutorAvailability
+from accounts.models import Tutor, Subject, Skill, TutorAvailability, TutorDocument
 from uniassist.utils import error_response, success_response
 
 from .serializers import (
@@ -44,6 +44,8 @@ from .serializers import (
     TutorAvailabilitySerializer,
     TutorListSerializer,
     TutorDetailSerializer,
+    TutorDocumentSerializer,
+    UploadTutorDocumentSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -176,9 +178,19 @@ class AddSubjectView(APIView):
 
         serializer = AddSubjectSerializer(data=request.data)
         if not serializer.is_valid():
-            first_error = next(iter(serializer.errors.values()))[0]
+            logger.error('AddSubjectView validation failed: %s', serializer.errors)
+            # Safely extract first error message
+            try:
+                first_error = next(iter(serializer.errors.values()))
+                if isinstance(first_error, list):
+                    message = str(first_error[0])
+                else:
+                    message = str(first_error)
+            except (StopIteration, IndexError):
+                message = 'Invalid data.'
+
             return error_response(
-                message=str(first_error),
+                message=message,
                 errors=serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -247,9 +259,18 @@ class AddSkillView(APIView):
 
         serializer = AddSkillSerializer(data=request.data)
         if not serializer.is_valid():
-            first_error = next(iter(serializer.errors.values()))[0]
+            logger.error('AddSkillView validation failed: %s', serializer.errors)
+            try:
+                first_error = next(iter(serializer.errors.values()))
+                if isinstance(first_error, list):
+                    message = str(first_error[0])
+                else:
+                    message = str(first_error)
+            except (StopIteration, IndexError):
+                message = 'Invalid data.'
+
             return error_response(
-                message=str(first_error),
+                message=message,
                 errors=serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -311,9 +332,18 @@ class AddAvailabilityView(APIView):
 
         serializer = AddAvailabilitySerializer(data=request.data)
         if not serializer.is_valid():
-            first_error = next(iter(serializer.errors.values()))[0]
+            logger.error('AddAvailabilityView validation failed: %s', serializer.errors)
+            try:
+                first_error = next(iter(serializer.errors.values()))
+                if isinstance(first_error, list):
+                    message = str(first_error[0])
+                else:
+                    message = str(first_error)
+            except (StopIteration, IndexError):
+                message = 'Invalid data.'
+
             return error_response(
-                message=str(first_error),
+                message=message,
                 errors=serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -380,6 +410,96 @@ class RemoveAvailabilityView(APIView):
 
         slot.delete()
         return success_response(message='Availability slot removed successfully.')
+
+
+# ─── 7a. Tutor Documents ──────────────────────────────────────────────────────
+
+class UploadTutorDocumentView(APIView):
+    """
+    POST /api/tutors/documents/upload/
+    Auth: Tutor JWT required.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        tutor, err = _get_tutor_or_error(request)
+        if err:
+            return err
+
+        serializer = UploadTutorDocumentSerializer(data=request.data)
+        if not serializer.is_valid():
+            logger.error('UploadTutorDocumentView validation failed: %s', serializer.errors)
+            try:
+                first_error = next(iter(serializer.errors.values()))
+                if isinstance(first_error, list):
+                    message = str(first_error[0])
+                else:
+                    message = str(first_error)
+            except (StopIteration, IndexError):
+                message = 'Invalid document data.'
+
+            return error_response(
+                message=message,
+                errors=serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        doc = serializer.save(tutor=tutor)
+        
+        resp_serializer = TutorDocumentSerializer(doc, context={'request': request})
+        return success_response(
+            message='Document uploaded successfully.',
+            data=resp_serializer.data,
+            status=status.HTTP_201_CREATED,
+        )
+
+class MyTutorDocumentsView(APIView):
+    """
+    GET /api/tutors/documents/
+    Auth: Tutor JWT required.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        tutor, err = _get_tutor_or_error(request)
+        if err:
+            return err
+
+        docs = tutor.documents.all().order_by('-uploaded_at')
+        serializer = TutorDocumentSerializer(docs, many=True, context={'request': request})
+        return success_response(
+            message='Documents retrieved successfully.',
+            data=serializer.data,
+        )
+
+class AdminTutorDocumentsView(APIView):
+    """
+    GET /api/tutors/<id>/documents/
+    Auth: Admin only
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, tutor_id):
+        if request.user.role != 'admin':
+            return error_response(
+                message='Only admins can view tutor documents.',
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        try:
+            tutor = Tutor.objects.get(id=tutor_id)
+        except Tutor.DoesNotExist:
+            return error_response(
+                message='Tutor not found.',
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        docs = tutor.documents.all().order_by('-uploaded_at')
+        serializer = TutorDocumentSerializer(docs, many=True, context={'request': request})
+        return success_response(
+            message='Documents retrieved successfully.',
+            data=serializer.data,
+        )
 
 
 # ─── 8. Public Tutor Listing ──────────────────────────────────────────────────

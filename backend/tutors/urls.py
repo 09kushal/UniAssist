@@ -69,6 +69,23 @@ urlpatterns = [
         name='availability-remove',
     ),
 
+    # ── Tutor Documents ────────────────────────────────────────────────────────
+    path(
+        'documents/upload/',
+        views.UploadTutorDocumentView.as_view(),
+        name='document-upload',
+    ),
+    path(
+        'documents/',
+        views.MyTutorDocumentsView.as_view(),
+        name='document-list',
+    ),
+    path(
+        '<int:tutor_id>/documents/',
+        views.AdminTutorDocumentsView.as_view(),
+        name='document-admin-list',
+    ),
+
     # ── Public Listing ─────────────────────────────────────────────────────────
     path(
         'list/',

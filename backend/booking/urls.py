@@ -18,6 +18,7 @@ from booking.views import (
     StudentBookingHistoryView,
     TutorBookingHistoryView,
     CancelBookingView,
+    JitsiJoinTokenView,
 )
 
 app_name = 'booking'
@@ -38,4 +39,7 @@ urlpatterns = [
 
     # Cancelling booking request
     path('<int:booking_id>/cancel/', CancelBookingView.as_view(), name='cancel'),
+
+    # Jitsi Join Token
+    path('<int:booking_id>/join-token/', JitsiJoinTokenView.as_view(), name='join-token'),
 ]

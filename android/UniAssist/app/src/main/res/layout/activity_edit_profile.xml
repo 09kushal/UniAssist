@@ -37,49 +37,46 @@
         </RelativeLayout>
 
         <!-- Profile Photo Section -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <FrameLayout
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="-50dp">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/ivProfile"
+            <ImageView
+                android:id="@+id/ivProfilePhoto"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_centerHorizontal="true"
                 android:scaleType="centerCrop"
-                android:src="@android:drawable/ic_menu_gallery"
-                app:shapeAppearanceOverlay="@style/CircleImage"
-                app:strokeColor="@color/white"
-                app:strokeWidth="4dp" />
-
-            <RelativeLayout
-                android:id="@+id/rlChangePhoto"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_alignBottom="@id/ivProfile"
-                android:layout_alignEnd="@id/ivProfile"
-                android:background="@drawable/bg_unread_indicator"
-                android:elevation="4dp">
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_centerInParent="true"
-                    android:src="@android:drawable/ic_menu_camera"
-                    app:tint="@color/white" />
-            </RelativeLayout>
+                android:background="@drawable/bg_teal_circle" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/ivProfile"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="8dp"
-                android:text="@string/tap_to_change"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
-        </RelativeLayout>
+                android:id="@+id/tvAvatarLetter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="@color/surface"
+                android:textStyle="bold"
+                android:textSize="36sp"
+                android:text="S" />
+
+            <FrameLayout
+                android:id="@+id/flCameraOverlay"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="bottom|end"
+                android:background="@color/accent"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="📷"
+                    android:textSize="14sp" />
+            </FrameLayout>
+        </FrameLayout>
 
         <!-- Form Section -->
         <androidx.cardview.widget.CardView
