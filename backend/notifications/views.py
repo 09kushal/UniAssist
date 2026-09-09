@@ -73,6 +73,21 @@ class MarkNotificationReadView(APIView):
             data={}
         )
 
+class NotificationDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        try:
+            notification = Notification.objects.get(id=pk, user=request.user)
+        except Notification.DoesNotExist:
+            return error_response(
+                message='Notification not found.',
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        notification.delete()
+        return success_response(message='Notification deleted successfully.')
+
 class MarkAllNotificationsReadView(APIView):
     permission_classes = [IsAuthenticated]
 

@@ -29,8 +29,10 @@ import retrofit2.Response;
 
 public class JoinSessionActivity extends AppCompatActivity {
 
+    private static final boolean IS_DEMO_MODE = false; // Temporary flag for Jitsi demo
     private int bookingId;
     private String userFullName;
+    private String userRole;
     private String token;
 
     @Override
@@ -40,6 +42,7 @@ public class JoinSessionActivity extends AppCompatActivity {
 
         bookingId = getIntent().getIntExtra("booking_id", -1);
         userFullName = getIntent().getStringExtra("user_full_name");
+        userRole = getIntent().getStringExtra("user_role");
 
         if (bookingId == -1) {
             Toast.makeText(this, "Invalid session", Toast.LENGTH_SHORT).show();
@@ -64,9 +67,53 @@ public class JoinSessionActivity extends AppCompatActivity {
         }
 
         if (allGranted) {
-            fetchTokenAndJoin();
+            startConferenceFlow();
         } else {
             ActivityCompat.requestPermissions(this, permissions, 101);
+        }
+    }
+
+    private void startConferenceFlow() {
+        if (IS_DEMO_MODE) {
+            launchDemoMeeting();
+        } else {
+            fetchTokenAndJoin();
+        }
+    }
+
+    private void launchDemoMeeting() {
+        // NOTE: DEMO MODE uses the public meet.jit.si service which requires a host to authenticate.
+        // The tutor should authenticate manually through the Jitsi UI to open the room for the student.
+        // JaaS (8x8.vc) remains the intended production implementation.
+        try {
+            Log.d("JitsiDemo", "Launching demo meeting for Booking: " + bookingId + " as Role: " + userRole);
+            
+            JitsiMeetUserInfo userInfo = new JitsiMeetUserInfo();
+            userInfo.setDisplayName(userFullName != null ? userFullName : "User");
+
+            // Generate a deterministic room name based on the booking ID
+            String roomName = "uniassist-demo-session-" + bookingId;
+            Log.d("JitsiDemo", "Demo room name: " + roomName);
+
+            boolean isTutor = "tutor".equalsIgnoreCase(userRole);
+
+            JitsiMeetConferenceOptions options = new JitsiMeetConferenceOptions.Builder()
+                    .setServerURL(new URL("https://meet.jit.si"))
+                    .setRoom(roomName)
+                    .setUserInfo(userInfo)
+                    .setAudioMuted(false)
+                    .setVideoMuted(false)
+                    .setFeatureFlag("welcomepage.enabled", false)
+                    // Enable prejoin for tutor so they can easily find the "I am the host" option
+                    .setFeatureFlag("prejoinpage.enabled", isTutor)
+                    .build();
+
+            JitsiMeetActivity.launch(this, options);
+            finish();
+        } catch (MalformedURLException e) {
+            Log.e("JitsiDemo", "Error parsing meet.jit.si URL", e);
+            Toast.makeText(this, "Error launching demo meeting", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
@@ -82,7 +129,7 @@ public class JoinSessionActivity extends AppCompatActivity {
                 }
             }
             if (allGranted) {
-                fetchTokenAndJoin();
+                startConferenceFlow();
             } else {
                 Toast.makeText(this, "Permissions required to join call", Toast.LENGTH_LONG).show();
                 finish();

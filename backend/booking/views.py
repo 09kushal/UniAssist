@@ -23,6 +23,7 @@ from rest_framework.pagination import PageNumberPagination
 
 from accounts.models import Student, Tutor, TutorAvailability
 from booking.models import Booking
+from booking.utils import expire_old_bookings
 from booking.serializers import (
     BookingSerializer,
     BookingRequestSerializer,
@@ -119,6 +120,9 @@ class BookingRequestView(APIView):
             booking_status=Booking.BookingStatus.PENDING,
             officially_scheduled=False,  # Phase 4 hard constraint
         )
+
+        from notifications.services import notify_new_booking
+        notify_new_booking(booking)
 
         resp_serializer = BookingSerializer(booking, context={'request': request})
         return success_response(
@@ -303,6 +307,9 @@ class StudentBookingHistoryView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        # Trigger self-healing expiration of old bookings
+        expire_old_bookings()
+
         qs = Booking.objects.filter(student=student).select_related(
             'student__user', 'tutor__user', 'selected_slot'
         ).order_by('-created_at')
@@ -364,6 +371,9 @@ class TutorBookingHistoryView(APIView):
                 message='Tutor profile not found.',
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+        # Trigger self-healing expiration of old bookings
+        expire_old_bookings()
 
         qs = Booking.objects.filter(tutor=tutor).select_related(
             'student__user', 'tutor__user', 'selected_slot'
@@ -484,6 +494,12 @@ class JitsiJoinTokenView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
+        if booking.booking_status == Booking.BookingStatus.EXPIRED:
+            return error_response(
+                message='This session has expired.',
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         # Check Payment / Scheduled
         if not booking.officially_scheduled:
             return error_response(
@@ -499,7 +515,7 @@ class JitsiJoinTokenView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        # Time gating check: allowed up to 10 minutes before
+        # Time gating check
         from django.utils import timezone
         now = timezone.now()
         import datetime
@@ -508,11 +524,21 @@ class JitsiJoinTokenView(APIView):
                 message='Session time not yet set for this booking.',
                 status=status.HTTP_403_FORBIDDEN,
             )
-        if now < session.scheduled_at - datetime.timedelta(minutes=10):
+
+        # 1. Early join check: Both can join up to 20 minutes before
+        if now < session.scheduled_at - datetime.timedelta(minutes=20):
             return error_response(
-                message='Too early to join. You can join 10 minutes before start.',
+                message='Too early to join. You can join 20 minutes before start.',
                 status=status.HTTP_403_FORBIDDEN,
             )
+
+        # 2. Late join check: Student blocked after 10 minutes, Tutor unrestricted
+        if request.user.role == 'student':
+            if now > session.scheduled_at + datetime.timedelta(minutes=10):
+                return error_response(
+                    message='Session entry closed. Students cannot join more than 10 minutes late.',
+                    status=status.HTTP_403_FORBIDDEN,
+                )
 
         # Determine moderator
         is_moderator = (user_id == booking.tutor.user_id)

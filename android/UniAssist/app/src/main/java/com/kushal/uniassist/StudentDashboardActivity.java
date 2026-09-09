@@ -366,8 +366,17 @@ public class StudentDashboardActivity extends AppCompatActivity {
         });
 
         llWhatsApp.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/977XXXXXXXXXX"));
-            startActivity(intent);
+            String url = "https://wa.me/9779849201344";
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                intent.setPackage("com.whatsapp");
+                startActivity(intent);
+            } catch (android.content.ActivityNotFoundException e) {
+                // WhatsApp not installed, fallback to browser
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
+            }
         });
 
         llInstagram.setOnClickListener(v -> {

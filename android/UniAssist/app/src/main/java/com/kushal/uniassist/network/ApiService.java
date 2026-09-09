@@ -261,6 +261,12 @@ public interface ApiService {
             @Path("id") int notificationId
     );
 
+    @DELETE("api/notifications/{id}/")
+    Call<ApiResponse<Object>> deleteNotification(
+            @Header("Authorization") String authHeader,
+            @Path("id") int notificationId
+    );
+
     @PATCH("api/notifications/read-all/")
     Call<Void> markAllNotificationsAsRead(
             @Header("Authorization") String authHeader

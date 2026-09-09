@@ -12,6 +12,14 @@ def create_notification(user, title, message, notification_type):
         send_fcm_notification(user.device_token, title, message)
     return notification
 
+def notify_new_booking(booking):
+    create_notification(
+        user=booking.tutor.user,
+        title="New Booking Request",
+        message=f"You have a new booking request from {booking.student.user.full_name} for {booking.subject_or_skill}.",
+        notification_type=Notification.NotificationType.BOOKING_REQUESTED
+    )
+
 def notify_booking_accepted(booking):
     create_notification(
         user=booking.student.user,

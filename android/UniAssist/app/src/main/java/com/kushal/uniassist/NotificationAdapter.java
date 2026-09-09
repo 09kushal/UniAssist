@@ -21,11 +21,23 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     public interface OnNotificationClickListener {
         void onNotificationClick(NotificationResponse notification);
+        void onNotificationDelete(NotificationResponse notification, int position);
     }
 
     public NotificationAdapter(List<NotificationResponse> notifications, OnNotificationClickListener listener) {
         this.notifications = notifications;
         this.listener = listener;
+    }
+
+    public void removeNotification(int position) {
+        if (position >= 0 && position < notifications.size()) {
+            notifications.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    public NotificationResponse getNotificationAt(int position) {
+        return notifications.get(position);
     }
 
     @NonNull

@@ -4,7 +4,8 @@ from notifications.views import (
     DeviceTokenUpdateView,
     MarkNotificationReadView,
     MarkAllNotificationsReadView,
-    UnreadNotificationCountView
+    UnreadNotificationCountView,
+    NotificationDeleteView
 )
 
 urlpatterns = [
@@ -12,4 +13,5 @@ urlpatterns = [
     path('read-all/', MarkAllNotificationsReadView.as_view(), name='mark-all-read'),
     path('unread-count/', UnreadNotificationCountView.as_view(), name='unread-count'),
     path('<int:pk>/read/', MarkNotificationReadView.as_view(), name='mark-read'),
+    path('<int:pk>/', NotificationDeleteView.as_view(), name='notification-delete'),
 ]

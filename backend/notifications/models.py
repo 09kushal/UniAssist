@@ -3,6 +3,7 @@ from accounts.models import User
 
 class Notification(models.Model):
     class NotificationType(models.TextChoices):
+        BOOKING_REQUESTED = 'booking_requested', 'Booking Requested'
         BOOKING_ACCEPTED = 'booking_accepted', 'Booking Accepted'
         BOOKING_REJECTED = 'booking_rejected', 'Booking Rejected'
         PAYMENT_CONFIRMED = 'payment_confirmed', 'Payment Confirmed'

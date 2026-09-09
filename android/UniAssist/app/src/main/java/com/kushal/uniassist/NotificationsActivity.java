@@ -10,14 +10,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.kushal.uniassist.models.ApiResponse;
 import com.kushal.uniassist.models.NotificationPaginatedResponse;
@@ -67,9 +70,21 @@ public class NotificationsActivity extends AppCompatActivity {
         tvUnreadCount = findViewById(R.id.tvUnreadCount);
         tvMarkAllRead = findViewById(R.id.tvMarkAllRead);
 
-        adapter = new NotificationAdapter(notificationList, this::markAsRead);
+        adapter = new NotificationAdapter(notificationList, new NotificationAdapter.OnNotificationClickListener() {
+            @Override
+            public void onNotificationClick(NotificationResponse notification) {
+                markAsRead(notification);
+            }
+
+            @Override
+            public void onNotificationDelete(NotificationResponse notification, int position) {
+                deleteNotification(notification, position);
+            }
+        });
         rvNotifications.setLayoutManager(new LinearLayoutManager(this));
         rvNotifications.setAdapter(adapter);
+
+        setupSwipeToDelete();
 
         if (tvMarkAllRead != null) tvMarkAllRead.setOnClickListener(v -> markAllAsRead());
 
@@ -118,6 +133,47 @@ public class NotificationsActivity extends AppCompatActivity {
         });
     }
 
+    private void setupSwipeToDelete() {
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                NotificationResponse notification = adapter.getNotificationAt(position);
+                deleteNotification(notification, position);
+            }
+        };
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rvNotifications);
+    }
+
+    private void deleteNotification(NotificationResponse notification, int position) {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        String authHeader = "Bearer " + sessionManager.getAccessToken();
+
+        // Optimistically remove from list
+        notificationList.remove(position);
+        adapter.notifyItemRemoved(position);
+
+        apiService.deleteNotification(authHeader, notification.getId()).enqueue(new Callback<ApiResponse<Object>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
+                if (!response.isSuccessful()) {
+                    Toast.makeText(NotificationsActivity.this, "Failed to delete", Toast.LENGTH_SHORT).show();
+                    fetchNotifications(); // Rollback on failure
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
+                Toast.makeText(NotificationsActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                fetchNotifications(); // Rollback on failure
+            }
+        });
+    }
     private void markAsRead(NotificationResponse notification) {
         if (notification.isRead()) return;
 

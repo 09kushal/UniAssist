@@ -10,3 +10,5 @@ docs/
 .env
 backend/firebase_credentials.json
 backend/jaas_private.pk
+media/
+*.pk
