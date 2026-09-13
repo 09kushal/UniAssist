@@ -1,1 +1,0 @@
-# accounts app package

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniAssist 🎓 | University Peer-Tutoring Platform by Kushal Neupane</title>
+    <meta name="description" content="UniAssist is an on-demand peer-tutoring platform with eSewa payments, 8x8 JaaS encrypted video calls, and Firebase push notifications. Developed by Kushal Neupane, Oxford College of Engineering and Management.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- BACKGROUND GLOW EFFECTS -->
+    <div class="glow-orb glow-top-left"></div>
+    <div class="glow-orb glow-top-right"></div>
+    <div class="glow-orb glow-bottom-center"></div>
+
+    <!-- TOP ANNOUNCEMENT BAR -->
+    <div class="top-banner">
+        <div class="container banner-content">
+            <span class="pulse-dot"></span>
+            <span>Academic Capstone Project &bull; <strong>Oxford College of Engineering and Management</strong> &bull; Developed by <strong>Kushal Neupane</strong></span>
+            <a href="https://github.com/09kushal/UniAssist" target="_blank" class="banner-link">View GitHub &rarr;</a>
+        </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <div class="logo-icon">🎓</div>
+                <div class="logo-text">
+                    <span class="brand-name">UniAssist</span>
+                    <span class="brand-tag">Peer Learning</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#simulator">Live App Demo</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#about">About Developer</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="https://github.com/09kushal/UniAssist" target="_blank" class="btn btn-outline">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    GitHub Code
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="hero">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <div class="badge-tag">
+                    <span class="sparkle">✨</span> Full-Stack Android &amp; Django Engineering
+                </div>
+                <h1 class="hero-title">
+                    University Peer Tutoring, <br>
+                    <span class="gradient-text">Engineered for Excellence.</span>
+                </h1>
+                <p class="hero-description">
+                    <strong>UniAssist</strong> connects university students with verified high-achieving student tutors. Built with native Android Java and Django REST Framework, featuring <strong>eSewa digital payments</strong>, <strong>8x8 JaaS HD encrypted video sessions</strong>, and <strong>Firebase real-time push alerts</strong>.
+                </p>
+
+                <!-- DEVELOPER HIGHLIGHT PILL -->
+                <div class="creator-card">
+                    <div class="creator-avatar">KN</div>
+                    <div class="creator-info">
+                        <span class="creator-name">Kushal Neupane</span>
+                        <span class="creator-inst">Oxford College of Engineering and Management</span>
+                    </div>
+                    <span class="creator-tag">Author &amp; Architect</span>
+                </div>
+
+                <div class="hero-buttons">
+                    <a href="#simulator" class="btn btn-primary">
+                        <span>📱 Explore Interactive App</span>
+                    </a>
+                    <a href="https://github.com/09kushal/UniAssist" target="_blank" class="btn btn-glass">
+                        <span>📂 Browse Repository</span>
+                    </a>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-num">100%</span>
+                        <span class="stat-lbl">Working Endpoints</span>
+                    </div>
+                    <div class="stat-sep"></div>
+                    <div class="stat-item">
+                        <span class="stat-num">eSewa</span>
+                        <span class="stat-lbl">Payment Gateway</span>
+                    </div>
+                    <div class="stat-sep"></div>
+                    <div class="stat-item">
+                        <span class="stat-num">8x8 JaaS</span>
+                        <span class="stat-lbl">HD Video Calling</span>
+                    </div>
+                    <div class="stat-sep"></div>
+                    <div class="stat-item">
+                        <span class="stat-num">FCM</span>
+                        <span class="stat-lbl">Push Notifications</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HERO PREVIEW INTERACTIVE PHONE -->
+            <div class="hero-phone-wrapper" id="simulator">
+                <div class="phone-tabs-bar">
+                    <button class="tab-btn active" onclick="switchScreen('dashboard')">Dashboard</button>
+                    <button class="tab-btn" onclick="switchScreen('tutors')">Tutors</button>
+                    <button class="tab-btn" onclick="switchScreen('payment')">eSewa Pay</button>
+                    <button class="tab-btn" onclick="switchScreen('video')">Jitsi Video</button>
+                    <button class="tab-btn" onclick="switchScreen('tutor-dash')">Tutor Portal</button>
+                </div>
+
+                <!-- PHONE DEVICE MOCKUP -->
+                <div class="device-phone">
+                    <div class="phone-notch">
+                        <div class="camera-lens"></div>
+                        <div class="speaker-grill"></div>
+                    </div>
+                    <div class="phone-status-bar">
+                        <span class="status-time">9:41</span>
+                        <span class="status-icons">📶 5G &bull; 100%</span>
+                    </div>
+
+                    <!-- SCREEN 1: STUDENT DASHBOARD -->
+                    <div class="screen-view active" id="screen-dashboard">
+                        <div class="screen-header">
+                            <div>
+                                <div class="greeting-sub">Good Morning,</div>
+                                <div class="student-title">Aayush Sharma 👋</div>
+                            </div>
+                            <div class="notif-badge">🔔 <span class="badge-dot"></span></div>
+                        </div>
+
+                        <div class="quick-balance-card">
+                            <div class="balance-label">Upcoming Session Today</div>
+                            <div class="balance-amount">Data Structures &amp; Algorithms</div>
+                            <div class="session-meta">📅 Today &bull; 4:00 PM (1.5 hrs) &bull; Jitsi Room Ready</div>
+                            <button class="action-pill-btn" onclick="switchScreen('video')">Join Jitsi Call &rarr;</button>
+                        </div>
+
+                        <div class="section-title">Verified Top Tutors</div>
+                        <div class="tutor-card-mini">
+                            <div class="tutor-avatar-circle">KN</div>
+                            <div class="tutor-details">
+                                <div class="tutor-name-verified">Kushal Neupane <span class="check-badge">✓</span></div>
+                                <div class="tutor-subject">Computer Engineering &bull; Oxford College</div>
+                                <div class="tutor-rate">NPR 500 / hr &bull; ⭐ 4.9 (124 reviews)</div>
+                            </div>
+                        </div>
+
+                        <div class="tutor-card-mini">
+                            <div class="tutor-avatar-circle" style="background:#4F46E5;">PS</div>
+                            <div class="tutor-details">
+                                <div class="tutor-name-verified">Pooja Sharma <span class="check-badge">✓</span></div>
+                                <div class="tutor-subject">Applied Mathematics &bull; Calculus III</div>
+                                <div class="tutor-rate">NPR 450 / hr &bull; ⭐ 4.8 (89 reviews)</div>
+                            </div>
+                        </div>
+
+                        <div class="app-credit-footer">
+                            Developed by Kushal Neupane<br>
+                            <small>Oxford College of Engineering and Management</small>
+                        </div>
+                    </div>
+
+                    <!-- SCREEN 2: TUTOR DISCOVERY -->
+                    <div class="screen-view" id="screen-tutors">
+                        <div class="screen-header">
+                            <div class="student-title">Find a Peer Tutor 🔍</div>
+                            <div class="filter-icon">⚙️</div>
+                        </div>
+
+                        <div class="search-input-sim">
+                            <span>🔍</span> Search subjects: Python, DBMS, OS...
+                        </div>
+
+                        <div class="chip-scroll">
+                            <span class="filter-chip active">All</span>
+                            <span class="filter-chip">Algorithms</span>
+                            <span class="filter-chip">Database</span>
+                            <span class="filter-chip">Networks</span>
+                        </div>
+
+                        <div class="tutor-listing-card">
+                            <div class="tutor-top-row">
+                                <div class="tutor-avatar-circle">KN</div>
+                                <div>
+                                    <div class="tutor-name-verified">Kushal Neupane <span class="check-badge">✓</span></div>
+                                    <div class="tutor-sub-text">B.E. Computer &bull; Oxford College</div>
+                                </div>
+                                <div class="price-tag">NPR 500/hr</div>
+                            </div>
+                            <div class="chip-row">
+                                <span class="mini-tag">Java</span>
+                                <span class="mini-tag">Python</span>
+                                <span class="mini-tag">Django</span>
+                            </div>
+                            <button class="btn-book-full" onclick="switchScreen('payment')">Book Consultation &rarr;</button>
+                        </div>
+
+                        <div class="app-credit-footer">
+                            Developed by Kushal Neupane<br>
+                            <small>Oxford College of Engineering and Management</small>
+                        </div>
+                    </div>
+
+                    <!-- SCREEN 3: ESEWA PAYMENT -->
+                    <div class="screen-view" id="screen-payment">
+                        <div class="screen-header">
+                            <div class="student-title">Session Checkout 💳</div>
+                        </div>
+
+                        <div class="checkout-box">
+                            <div class="checkout-row">
+                                <span>Subject</span>
+                                <strong>System Architecture &amp; OOP</strong>
+                            </div>
+                            <div class="checkout-row">
+                                <span>Tutor</span>
+                                <strong>Kushal Neupane</strong>
+                            </div>
+                            <div class="checkout-row">
+                                <span>Scheduled Time</span>
+                                <strong>Tomorrow, 5:00 PM (1 hr)</strong>
+                            </div>
+                            <div class="checkout-divider"></div>
+                            <div class="checkout-row total-row">
+                                <span>Total Amount (NPR)</span>
+                                <span class="price-highlight">NPR 500.00</span>
+                            </div>
+                        </div>
+
+                        <div class="esewa-payment-banner">
+                            <div class="esewa-logo-badge">eSewa</div>
+                            <div>
+                                <div class="esewa-title">eSewa EPAY v2 Secure Gateway</div>
+                                <div class="esewa-sub">HMAC-SHA256 Encrypted Signature</div>
+                            </div>
+                        </div>
+
+                        <button class="btn-esewa-pay" onclick="simulatePaymentSuccess()">
+                            <span>Pay with eSewa (NPR 500)</span>
+                        </button>
+                        <div id="payment-status-message" class="status-alert" style="display:none;"></div>
+
+                        <div class="app-credit-footer">
+                            Developed by Kushal Neupane<br>
+                            <small>Oxford College of Engineering and Management</small>
+                        </div>
+                    </div>
+
+                    <!-- SCREEN 4: JITSI VIDEO MEETING -->
+                    <div class="screen-view" id="screen-video">
+                        <div class="video-container-sim">
+                            <div class="video-participant tutor-cam">
+                                <div class="participant-name">👨‍🏫 Kushal Neupane (Tutor)</div>
+                                <div class="jaas-badge">🔒 8x8 JaaS Encrypted (RS256)</div>
+                            </div>
+                            <div class="video-participant self-cam">
+                                <div class="participant-name">You (Student)</div>
+                            </div>
+                        </div>
+
+                        <div class="video-controls-bar">
+                            <button class="v-btn mic-btn">🎤</button>
+                            <button class="v-btn cam-btn">📹</button>
+                            <button class="v-btn chat-btn">💬</button>
+                            <button class="v-btn end-btn" onclick="switchScreen('dashboard')">📞</button>
+                        </div>
+                        <div class="video-meta-tag">Room: uniassist-session-8249 &bull; Live HD</div>
+
+                        <div class="app-credit-footer" style="margin-top:12px;">
+                            Developed by Kushal Neupane<br>
+                            <small>Oxford College of Engineering and Management</small>
+                        </div>
+                    </div>
+
+                    <!-- SCREEN 5: TUTOR DASHBOARD -->
+                    <div class="screen-view" id="screen-tutor-dash">
+                        <div class="screen-header">
+                            <div>
+                                <div class="greeting-sub">Tutor Portal</div>
+                                <div class="student-title">Kushal Neupane 🎓</div>
+                            </div>
+                            <span class="status-verified-badge">VERIFIED TUTOR</span>
+                        </div>
+
+                        <div class="earnings-card">
+                            <div class="earnings-label">Total Completed Earnings</div>
+                            <div class="earnings-amount">NPR 14,500.00</div>
+                            <div class="earnings-sub">29 Sessions Completed &bull; 4.9 Rating</div>
+                            <button class="action-pill-btn" style="background:#059669;">Request Payout &rarr;</button>
+                        </div>
+
+                        <div class="section-title">Pending Booking Requests</div>
+                        <div class="request-card-mini">
+                            <div class="req-title">Bikash Shrestha &bull; Calculus II</div>
+                            <div class="req-time">📅 Sep 15, 6:00 PM (1.5 hrs) &bull; NPR 750</div>
+                            <div class="btn-group-mini">
+                                <button class="btn-accept">Accept</button>
+                                <button class="btn-reject">Decline</button>
+                            </div>
+                        </div>
+
+                        <div class="app-credit-footer">
+                            Developed by Kushal Neupane<br>
+                            <small>Oxford College of Engineering and Management</small>
+                        </div>
+                    </div>
+
+                    <!-- PHONE BOTTOM NAVIGATION -->
+                    <div class="phone-bottom-nav">
+                        <span class="nav-item-icon active" onclick="switchScreen('dashboard')">🏠<br><small>Home</small></span>
+                        <span class="nav-item-icon" onclick="switchScreen('tutors')">🔍<br><small>Search</small></span>
+                        <span class="nav-item-icon" onclick="switchScreen('payment')">📅<br><small>Book</small></span>
+                        <span class="nav-item-icon" onclick="switchScreen('tutor-dash')">👤<br><small>Profile</small></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CORE FEATURES SECTION -->
+    <section class="section" id="features">
+        <div class="container">
+            <div class="section-badge">✨ Architectural Highlights</div>
+            <h2 class="section-heading">Engineered for Reliability, Built for Students</h2>
+            <p class="section-subtext">Every module in UniAssist is crafted to replicate a professional peer-consultation lifecycle with bank-grade security.</p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:#E0F2FE; color:#0284C7;">💳</div>
+                    <h3>eSewa EPAY v2 Integration</h3>
+                    <p>Digital payments implemented via eSewa with client-to-server signature calculation, HMAC-SHA256 data signing, and instant backend payment status confirmation.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:#DCFCE7; color:#16A34A;">📹</div>
+                    <h3>8x8 JaaS HD Video Calling</h3>
+                    <p>WebRTC video meetings signed using RS256 private key tokens. Session rooms enforce strict join-time windows and auto-grant moderator rights to verified tutors.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:#FEF3C7; color:#D97706;">🔔</div>
+                    <h3>Firebase Cloud Push Alerts</h3>
+                    <p>Real-time FCM notifications dispatch instantly when tutors accept/reject requests, when sessions start, and when payments complete.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:#FEE2E2; color:#DC2626;">🛡️</div>
+                    <h3>Lateness &amp; Dispute Escalation</h3>
+                    <p>Students can report late or no-show tutors directly from their booking cards with automated dispute logging and instant WhatsApp administrator escalation.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:#EDE9FE; color:#7C3AED;">⏱️</div>
+                    <h3>Self-Healing Booking Expiration</h3>
+                    <p>Background self-healing logic automatically sweeps past-scheduled unattended sessions and flags them as expired, keeping dashboards crisp and accurate.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:#CCFBF1; color:#0D9488;">🏛️</div>
+                    <h3>Django Admin Escrow Payouts</h3>
+                    <p>Admin portal features custom bulk-release actions allowing platform managers to verify completed sessions and release accumulated earnings to tutors.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SYSTEM ARCHITECTURE DIAGRAM -->
+    <section class="section section-dark" id="architecture">
+        <div class="container">
+            <div class="section-badge">🏗️ Architecture Overview</div>
+            <h2 class="section-heading">End-to-End System Infrastructure</h2>
+            <p class="section-subtext">How UniAssist coordinates mobile native clients, API gateways, database transactions, and cloud microservices.</p>
+
+            <div class="arch-box">
+                <div class="arch-flow-grid">
+                    <div class="arch-card">
+                        <div class="arch-num">01</div>
+                        <h4>Android Client</h4>
+                        <p>Java, Material Design, Retrofit 2, Glide, OkHttp, Jitsi SDK, Firebase SDK</p>
+                    </div>
+                    <div class="arch-arrow">&rarr;</div>
+                    <div class="arch-card">
+                        <div class="arch-num">02</div>
+                        <h4>Ngrok Proxy / API</h4>
+                        <p>Secure TLS tunneling forwarder connecting physical mobile devices to Django</p>
+                    </div>
+                    <div class="arch-arrow">&rarr;</div>
+                    <div class="arch-card">
+                        <div class="arch-num">03</div>
+                        <h4>Django REST Backend</h4>
+                        <p>Python 3, DRF, JWT Authentication, Custom User Roles, Booking State Machine</p>
+                    </div>
+                    <div class="arch-arrow">&rarr;</div>
+                    <div class="arch-card">
+                        <div class="arch-num">04</div>
+                        <h4>MySQL &amp; Services</h4>
+                        <p>MySQL 8, eSewa EPAY v2, 8x8 JaaS Tokens, Firebase FCM Admin, Gmail SMTP</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT DEVELOPER / CREDITS CARD -->
+    <section class="section" id="about">
+        <div class="container">
+            <div class="developer-spotlight">
+                <div class="dev-badge">🎓 Lead Developer Spotlight</div>
+                <h2 class="dev-name">Kushal Neupane</h2>
+                <div class="dev-institution">Oxford College of Engineering and Management</div>
+                <p class="dev-bio">
+                    Designed, architected, and developed the complete <strong>UniAssist</strong> platform as an academic project. Spanning native Android development in Java and backend microservice design in Django REST Framework, with integrated digital payments, encrypted video calling, and push notification infrastructure.
+                </p>
+
+                <div class="dev-meta-grid">
+                    <div class="dev-meta-card">
+                        <span class="meta-title">Project Name</span>
+                        <span class="meta-val">UniAssist</span>
+                    </div>
+                    <div class="dev-meta-card">
+                        <span class="meta-title">Developer</span>
+                        <span class="meta-val">Kushal Neupane</span>
+                    </div>
+                    <div class="dev-meta-card">
+                        <span class="meta-title">Institution</span>
+                        <span class="meta-val">Oxford College of Eng. &amp; Mgmt.</span>
+                    </div>
+                    <div class="dev-meta-card">
+                        <span class="meta-title">GitHub</span>
+                        <span class="meta-val"><a href="https://github.com/09kushal/UniAssist" target="_blank" style="color:#00A884; font-weight:600;">github.com/09kushal</a></span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 32px;">
+                    <a href="https://github.com/09kushal/UniAssist" target="_blank" class="btn btn-primary">
+                        <span>🌟 Star on GitHub Repository</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-logo">
+                🎓 <strong>UniAssist</strong> &bull; University Peer-Tutoring Platform
+            </div>
+            <div class="footer-credit">
+                <strong>Made by Kushal Neupane</strong><br>
+                <span>College: Oxford College of Engineering and Management</span>
+            </div>
+            <div class="footer-copy">
+                &copy; 2026 UniAssist. Open-Source Academic Portfolio Project.
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

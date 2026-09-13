@@ -1,1 +1,0 @@
-# accounts migrations package

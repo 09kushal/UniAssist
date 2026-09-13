@@ -1,8 +1,0 @@
-<!-- Logo icon - teal circle with U -->
-<TextView android:layout_width="36dp" android:layout_height="36dp"
-    android:background="@drawable/bg_teal_circle" android:gravity="center" android:text="U"
-    android:textColor="@color/surface" android:textStyle="bold" android:textSize="18sp"
-    android:layout_marginEnd="8dp" />
-
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="UniAssist"
-android:textColor="@color/primary" android:textStyle="bold" android:textSize="18sp" />

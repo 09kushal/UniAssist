@@ -1,2 +1,0 @@
-# UniAssist Django project package
-
