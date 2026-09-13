@@ -1,6 +1,15 @@
 # UniAssist 🎓
 
+[![Live Showcase & Simulator](https://img.shields.io/badge/Live_Showcase-GitHub_Pages-00A884?style=for-the-badge&logo=github&logoColor=white)](https://09kushal.github.io/UniAssist/)
+[![Android SDK](https://img.shields.io/badge/Platform-Android_34-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/09kushal/UniAssist)
+[![Django Backend](https://img.shields.io/badge/Backend-Django_REST_Framework-092E20?style=for-the-badge&logo=django&logoColor=white)](https://github.com/09kushal/UniAssist)
+[![Author](https://img.shields.io/badge/Author-Kushal_Neupane-blue?style=for-the-badge)](https://github.com/09kushal)
+[![Institution](https://img.shields.io/badge/Institution-Oxford_College_of_Eng._%26_Mgmt.-orange?style=for-the-badge)](https://github.com/09kushal/UniAssist)
+
+> 🌐 **Live Web Showcase & Interactive Mobile Simulator**: [https://09kushal.github.io/UniAssist/](https://09kushal.github.io/UniAssist/)
+
 **UniAssist** is an on-demand peer-tutoring and academic consultation platform connecting university students with verified student tutors. It features end-to-end booking workflows, secure digital payments via eSewa, live encrypted video sessions powered by 8x8 JaaS (Jitsi as a Service), Firebase Cloud Messaging (FCM) push notifications, and dispute/lateness reporting.
+
 
 ---
 
