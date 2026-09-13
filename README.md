@@ -150,6 +150,15 @@ UniAssist/
    cd backend
    python manage.py runserver 0.0.0.0:8000
    ```
+   > **Quick Alias**: You can add this shortcut to your `~/.zshrc` to launch the server instantly by typing `uniassist`:
+   > ```bash
+   > alias uniassist='source ~/UniAssist/venv/bin/activate && cd ~/UniAssist/backend && python manage.py runserver 0.0.0.0:8000'
+   > ```
+
+7. **Start Ngrok (for Physical Android Device Testing)**:
+   ```bash
+   ngrok http --url=yin-elongated-studio.ngrok-free.dev 8000
+   ```
 
 ---
 
@@ -158,7 +167,10 @@ UniAssist/
 1. Open **Android Studio**.
 2. Select **Open an Existing Project** and navigate to `UniAssist/android/UniAssist`.
 3. Allow Gradle to sync dependencies.
-4. Ensure `backend/` server or Ngrok URL matches `BASE_URL` in `ApiService.java`.
+4. In `ApiClient.java`, verify that `BASE_URL` matches your local server or Ngrok URL:
+   ```java
+   private static final String BASE_URL = "https://yin-elongated-studio.ngrok-free.dev/";
+   ```
 5. Build and run on an Android device or emulator (Android 8.0+ / API 26+).
 
 ---
