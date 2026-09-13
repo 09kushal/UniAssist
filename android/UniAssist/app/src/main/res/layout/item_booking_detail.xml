@@ -65,11 +65,14 @@
 
         <TextView
             android:id="@+id/tvSubject"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Subject: Mathematics"
-            android:textColor="@color/text_primary"
-            android:textSize="14sp"
+            android:background="@drawable/bg_domain_chip"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:text="Mathematics"
+            android:textColor="@color/white"
+            android:textSize="12sp"
             android:textStyle="bold" />
 
         <LinearLayout

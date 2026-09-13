@@ -24,6 +24,7 @@ Role enforcement:
 """
 
 import logging
+from decimal import Decimal, InvalidOperation
 
 from django.db.models import Avg, Q
 from rest_framework import status
@@ -513,8 +514,10 @@ class TutorListView(APIView):
       domain        — filter by domain (academic/skill/both)
       subject       — filter by subject name (case-insensitive contains)
       skill         — filter by skill name (case-insensitive contains)
-      min_rating    — minimum average rating (float, applied in Python)
       available_day — filter by available day (Mon/Tue/Wed/Thu/Fri/Sat/Sun)
+      min_price     — minimum price per session (pricing_per_session >= min_price)
+      max_price     — maximum price per session (pricing_per_session <= max_price)
+      min_rating    — minimum average rating (float, avg Review.rating >= min_rating)
       page          — page number (default: 1)
       page_size     — results per page (default: 20, max: 100)
 
@@ -546,6 +549,28 @@ class TutorListView(APIView):
         if available_day:
             qs = qs.filter(availability_slots__day_of_week=available_day).distinct()
 
+        min_price = request.query_params.get('min_price')
+        if min_price is not None and min_price != '':
+            try:
+                min_price_val = Decimal(str(min_price))
+                qs = qs.filter(pricing_per_session__gte=min_price_val)
+            except (InvalidOperation, TypeError, ValueError):
+                return error_response(
+                    message='min_price must be a valid number.',
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        max_price = request.query_params.get('max_price')
+        if max_price is not None and max_price != '':
+            try:
+                max_price_val = Decimal(str(max_price))
+                qs = qs.filter(pricing_per_session__lte=max_price_val)
+            except (InvalidOperation, TypeError, ValueError):
+                return error_response(
+                    message='max_price must be a valid number.',
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
         # ── Annotate average rating and order ──────────────────────────────────
         try:
             qs = qs.annotate(avg_rating=Avg('reviews_received__rating'))
@@ -556,7 +581,7 @@ class TutorListView(APIView):
 
         # ── min_rating filter (applied after annotation) ───────────────────────
         min_rating = request.query_params.get('min_rating')
-        if min_rating:
+        if min_rating is not None and min_rating != '':
             try:
                 min_rating_val = float(min_rating)
                 qs = qs.filter(avg_rating__gte=min_rating_val)

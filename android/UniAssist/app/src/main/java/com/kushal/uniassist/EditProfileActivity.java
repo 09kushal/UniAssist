@@ -54,7 +54,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_PERMISSION = 101;
 
     private EditText etFullName, etEmail, etGradeOrUniversity, etSubjectsOfInterest;
-    private Button btnSaveProfile;
+    private Button btnSaveProfile, btnUpdateAcademic;
     private ProgressBar progressBar;
     private ImageView ivBack, ivProfilePhoto;
     private TextView tvAvatarLetter;
@@ -88,6 +88,7 @@ public class EditProfileActivity extends AppCompatActivity {
         etGradeOrUniversity = findViewById(R.id.etGradeUniversity);
         etSubjectsOfInterest = findViewById(R.id.etSubjectsOfInterest);
         btnSaveProfile = findViewById(R.id.btnSaveProfile);
+        btnUpdateAcademic = findViewById(R.id.btnUpdateAcademic);
         progressBar = findViewById(R.id.progressBar);
         ivBack = findViewById(R.id.ivBack);
         ivProfilePhoto = findViewById(R.id.ivProfilePhoto);
@@ -102,6 +103,9 @@ public class EditProfileActivity extends AppCompatActivity {
         loadProfile();
 
         btnSaveProfile.setOnClickListener(v -> saveProfile());
+        if (btnUpdateAcademic != null) {
+            btnUpdateAcademic.setOnClickListener(v -> saveProfile());
+        }
         
         flCameraOverlay.setOnClickListener(v -> checkPermissionsAndPickImage());
         rlChangePassword.setOnClickListener(v -> startActivity(new Intent(this, ForgotPasswordActivity.class)));

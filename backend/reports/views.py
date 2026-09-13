@@ -195,19 +195,17 @@ class StudentFileLatenessReportView(APIView):
 
         # Fetch session and verify it belongs to this student's booking
         try:
-            session = Session.objects.select_related('booking__student').get(
-                id=data['session_id']
-            )
-        except Session.DoesNotExist:
+            booking = Booking.objects.get(id=data['booking_id'], student=student)
+            session = booking.sessions.order_by('-created_at').first()
+            if not session:
+                 return Response(
+                    {'success': False, 'message': 'No session found for this booking.'},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        except Booking.DoesNotExist:
             return Response(
-                {'success': False, 'message': 'Session not found.'},
+                {'success': False, 'message': 'Booking not found or not yours.'},
                 status=status.HTTP_404_NOT_FOUND,
-            )
-
-        if session.booking.student != student:
-            return Response(
-                {'success': False, 'message': 'You can only report on your own sessions.'},
-                status=status.HTTP_403_FORBIDDEN,
             )
 
         # One report per session per student
@@ -267,19 +265,17 @@ class TutorFileStudentReportView(APIView):
 
         # Fetch session and verify it belongs to this tutor's booking
         try:
-            session = Session.objects.select_related('booking__tutor').get(
-                id=data['session_id']
-            )
-        except Session.DoesNotExist:
+            booking = Booking.objects.get(id=data['booking_id'], tutor=tutor)
+            session = booking.sessions.order_by('-created_at').first()
+            if not session:
+                 return Response(
+                    {'success': False, 'message': 'No session found for this booking.'},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        except Booking.DoesNotExist:
             return Response(
-                {'success': False, 'message': 'Session not found.'},
+                {'success': False, 'message': 'Booking not found or not yours.'},
                 status=status.HTTP_404_NOT_FOUND,
-            )
-
-        if session.booking.tutor != tutor:
-            return Response(
-                {'success': False, 'message': 'You can only report on your own sessions.'},
-                status=status.HTTP_403_FORBIDDEN,
             )
 
         # One report per session per tutor

@@ -302,6 +302,7 @@ class TutorDetailSerializer(serializers.ModelSerializer):
     availability_slots = PublicAvailabilitySerializer(many=True, read_only=True)
     average_rating     = serializers.SerializerMethodField()
     review_count       = serializers.SerializerMethodField()
+    total_earnings     = serializers.SerializerMethodField()
     is_verified_badge  = serializers.BooleanField(source='is_verified', read_only=True)
     profile_photo_url  = serializers.SerializerMethodField()
 
@@ -320,6 +321,7 @@ class TutorDetailSerializer(serializers.ModelSerializer):
             'is_suspended',
             'punctuality_score',
             'total_sessions_done',
+            'total_earnings',
             'average_rating',
             'review_count',
             'subjects',
@@ -341,6 +343,19 @@ class TutorDetailSerializer(serializers.ModelSerializer):
             return obj.reviews_received.count()
         except Exception:
             return 0
+
+    def get_total_earnings(self, obj):
+        """Sum of released payouts."""
+        try:
+            from django.db.models import Sum
+            from payments.models import Payout
+            result = Payout.objects.filter(
+                tutor=obj,
+                payout_status=Payout.PayoutStatus.RELEASED
+            ).aggregate(total=Sum('tutor_final_payout'))
+            return float(result.get('total') or 0.0)
+        except Exception:
+            return 0.0
 
     def get_profile_photo_url(self, obj):
         request = self.context.get('request')

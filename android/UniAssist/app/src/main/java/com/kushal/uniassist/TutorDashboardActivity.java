@@ -217,13 +217,9 @@ public class TutorDashboardActivity extends AppCompatActivity {
         if (tvTutorRating != null) {
             tvTutorRating.setText(String.format(java.util.Locale.US, "%.1f", tutor.getAverageRatingFloat()));
         }
-        
-        try {
-            double price = Double.parseDouble(tutor.getPricingPerSession());
-            int total = (int)(tutor.getTotalSessionsDone() * price);
-            if (tvEarnings != null) tvEarnings.setText("NPR " + total);
-        } catch (Exception e) {
-            if (tvEarnings != null) tvEarnings.setText("NPR 0");
+
+        if (tvEarnings != null) {
+            tvEarnings.setText(String.format(java.util.Locale.US, "NPR %.2f", tutor.getTotalEarnings()));
         }
 
         if (ivTutorAvatar != null) {

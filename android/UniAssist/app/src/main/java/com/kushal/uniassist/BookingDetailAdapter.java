@@ -94,7 +94,7 @@ public class BookingDetailAdapter extends RecyclerView.Adapter<BookingDetailAdap
                 tvTutorDomain.setText("");
             }
 
-            tvSubject.setText("Subject: " + booking.getSubjectOrSkill());
+            tvSubject.setText(booking.getSubjectOrSkill());
             tvDate.setText(booking.getProposedDate());
             tvTime.setText(booking.getProposedStartTime() + " - " + booking.getProposedEndTime());
 
@@ -111,6 +111,9 @@ public class BookingDetailAdapter extends RecyclerView.Adapter<BookingDetailAdap
                     break;
                 case "rejected":
                     colorRes = android.R.color.holo_red_dark;
+                    break;
+                case "expired":
+                    colorRes = R.color.text_hint;
                     break;
                 case "completed":
                     colorRes = R.color.primary;

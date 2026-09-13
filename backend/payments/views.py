@@ -79,8 +79,8 @@ ESEWA_PRODUCT_CODE   = getattr(settings, 'ESEWA_PRODUCT_CODE', 'EPAYTEST')
 ESEWA_SECRET_KEY     = '8gBm/:&EnhH.1/q'          # eSewa sandbox HMAC key
 ESEWA_PAYMENT_URL    = 'https://rc-epay.esewa.com.np/api/epay/main/v2/form'
 ESEWA_VERIFY_URL     = 'https://rc-epay.esewa.com.np/api/epay/transaction/status/'
-ESEWA_SUCCESS_URL    = 'http://127.0.0.1:8000/api/payments/callback/'
-ESEWA_FAILURE_URL    = 'http://127.0.0.1:8000/api/payments/failed/'
+ESEWA_SUCCESS_URL    = 'https://yin-elongated-studio.ngrok-free.dev/api/payments/callback/'
+ESEWA_FAILURE_URL    = 'https://yin-elongated-studio.ngrok-free.dev/api/payments/failed/'
 
 # ─── Commission Constants (settings.py already defines these) ─────────────────
 
@@ -305,13 +305,11 @@ class InitiatePaymentView(APIView):
 
 class PaymentCallbackView(APIView):
     """
-    POST /api/payments/callback/
-    Auth: None — eSewa calls this endpoint directly after payment.
+    GET/POST /api/payments/callback/
+    Auth: None — eSewa calls this endpoint directly or redirects here.
 
-    eSewa sends back:
-      - transaction_code, status, total_amount, transaction_uuid,
-        product_code, signed_field_names, signature  (Base64 encoded)
-      - OR a Base64-encoded JSON in a single 'data' field (v2 format)
+    Handles eSewa v2 callback data which can arrive as a GET (redirect)
+    or POST (webhook). Payload is a Base64-encoded JSON in the 'data' field.
 
     Actions on success:
       1. Verify HMAC-SHA256 signature.
@@ -324,11 +322,21 @@ class PaymentCallbackView(APIView):
     """
     permission_classes = [AllowAny]
 
-    def post(self, request):
-        try:
-            raw_data = request.data
+    def get(self, request):
+        return self._handle_callback(request)
 
-            # eSewa v2 sends a Base64-encoded JSON under the key 'data'
+    def post(self, request):
+        return self._handle_callback(request)
+
+    def _handle_callback(self, request):
+        try:
+            # 1. Collect all possible data (POST body + GET params)
+            raw_data = {}
+            raw_data.update(request.query_params.dict())
+            if isinstance(request.data, dict):
+                raw_data.update(request.data)
+
+            # 2. eSewa v2 sends a Base64-encoded JSON under the key 'data'
             if 'data' in raw_data and isinstance(raw_data.get('data'), str):
                 try:
                     decoded = base64.b64decode(raw_data['data']).decode('utf-8')
@@ -377,6 +385,28 @@ class PaymentCallbackView(APIView):
 
                 # Create Pending Payout
                 create_pending_payout(booking, payment.amount)
+
+                # 3. Create Session (Phase 9 integration)
+                try:
+                    import datetime
+                    # Naive combine
+                    scheduled_dt = datetime.datetime.combine(
+                        booking.proposed_date,
+                        booking.proposed_start_time
+                    )
+                    if timezone.is_naive(scheduled_dt):
+                        scheduled_dt = timezone.make_aware(scheduled_dt)
+
+                    Session.objects.get_or_create(
+                        booking=booking,
+                        defaults={
+                            'scheduled_at': scheduled_dt,
+                            'officially_scheduled': True,
+                            'session_status': Session.SessionStatus.PENDING
+                        }
+                    )
+                except Exception as e:
+                    logger.error("Failed to auto-create Session in eSewa callback: %s", e)
 
                 from notifications.services import notify_payment_confirmed
                 notify_payment_confirmed(booking)

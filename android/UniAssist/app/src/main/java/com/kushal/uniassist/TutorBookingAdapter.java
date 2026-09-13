@@ -96,6 +96,9 @@ public class TutorBookingAdapter extends RecyclerView.Adapter<TutorBookingAdapte
                 case "rejected":
                     color = Color.parseColor("#EF4444");
                     break;
+                case "expired":
+                    color = Color.parseColor("#9CA3AF");
+                    break;
                 case "pending":
                 default:
                     color = Color.parseColor("#F59E0B");

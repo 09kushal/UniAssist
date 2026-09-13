@@ -43,6 +43,7 @@ class Booking(models.Model):
         REJECTED  = 'rejected',  'Rejected'
         CANCELLED = 'cancelled', 'Cancelled'
         COMPLETED = 'completed', 'Completed'  # set in Phase 5 after session
+        EXPIRED   = 'expired',   'Expired'
 
     student  = models.ForeignKey(
         Student,

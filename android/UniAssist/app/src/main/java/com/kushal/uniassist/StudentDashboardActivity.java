@@ -34,6 +34,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.textfield.TextInputEditText;
 import com.kushal.uniassist.models.ApiResponse;
 import com.kushal.uniassist.models.PaginatedResponse;
 import com.kushal.uniassist.models.BookingResponse;
@@ -56,7 +58,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
     private TextView tvGreeting, tvStudentName, tvBookingCount, tvSessionsDone, tvPendingCount, tvNoBookings, tvNotifBadge, tvSectionTitle, tvStudentInitial;
     private TextView btnAcademic, btnSkill, tvViewAll, tvSeeAll;
     private EditText etSearch;
-    private ImageView ivSearchBtn, ivStudentPhoto, ivWhatsApp, ivInstagram, ivAppLogo;
+    private ImageView ivSearchBtn, ivStudentPhoto, ivWhatsApp, ivInstagram, ivAppLogo, btnFilter;
     private LinearLayout llFacebook, llWhatsApp, llInstagram;
     private android.widget.ImageButton btnNotifications;
     private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout;
@@ -68,6 +70,10 @@ public class StudentDashboardActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private ApiService apiService;
     private String currentDomain = "academic";
+
+    private Integer filterMinPrice = null;
+    private Integer filterMaxPrice = null;
+    private Integer filterMinRating = null;
 
     private Handler autoScrollHandler = new Handler(Looper.getMainLooper());
     private Runnable autoScrollRunnable;
@@ -136,6 +142,7 @@ public class StudentDashboardActivity extends AppCompatActivity {
         llFacebook = findViewById(R.id.llFacebook);
         llWhatsApp = findViewById(R.id.llWhatsApp);
         llInstagram = findViewById(R.id.llInstagram);
+        btnFilter = findViewById(R.id.btnFilter);
         cardReportProblem = findViewById(R.id.cardReportProblem);
         CardView cardAboutUs = findViewById(R.id.cardAboutUs);
         if (cardAboutUs != null) {
@@ -384,6 +391,8 @@ public class StudentDashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        btnFilter.setOnClickListener(v -> showFilterBottomSheet());
+
         cardReportProblem.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_SENDTO);
             intent.setData(Uri.parse("mailto:"));
@@ -486,9 +495,48 @@ public class StudentDashboardActivity extends AppCompatActivity {
         loadBookingStats();
     }
 
+    private void showFilterBottomSheet() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_filter, null);
+        bottomSheetDialog.setContentView(view);
+
+        TextInputEditText etMin = view.findViewById(R.id.etMinPrice);
+        TextInputEditText etMax = view.findViewById(R.id.etMaxPrice);
+        TextInputEditText etRating = view.findViewById(R.id.etMinRating);
+        View btnApply = view.findViewById(R.id.btnApply);
+        View btnReset = view.findViewById(R.id.btnReset);
+
+        if (filterMinPrice != null) etMin.setText(String.valueOf(filterMinPrice));
+        if (filterMaxPrice != null) etMax.setText(String.valueOf(filterMaxPrice));
+        if (filterMinRating != null) etRating.setText(String.valueOf(filterMinRating));
+
+        btnApply.setOnClickListener(v -> {
+            String minS = etMin.getText().toString().trim();
+            String maxS = etMax.getText().toString().trim();
+            String ratingS = etRating.getText().toString().trim();
+
+            filterMinPrice = minS.isEmpty() ? null : Integer.parseInt(minS);
+            filterMaxPrice = maxS.isEmpty() ? null : Integer.parseInt(maxS);
+            filterMinRating = ratingS.isEmpty() ? null : Integer.parseInt(ratingS);
+
+            loadFeaturedTutors(currentDomain);
+            bottomSheetDialog.dismiss();
+        });
+
+        btnReset.setOnClickListener(v -> {
+            filterMinPrice = null;
+            filterMaxPrice = null;
+            filterMinRating = null;
+            loadFeaturedTutors(currentDomain);
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetDialog.show();
+    }
+
     private void loadFeaturedTutors(String domain) {
         String authHeader = "Bearer " + sessionManager.getAccessToken();
-        apiService.getTutorList(authHeader, domain, 1).enqueue(new Callback<ApiResponse<PaginatedResponse<TutorResponse>>>() {
+        apiService.getTutorList(authHeader, domain, 1, filterMinPrice, filterMaxPrice, filterMinRating).enqueue(new Callback<ApiResponse<PaginatedResponse<TutorResponse>>>() {
             @Override
             public void onResponse(Call<ApiResponse<PaginatedResponse<TutorResponse>>> call, Response<ApiResponse<PaginatedResponse<TutorResponse>>> response) {
                 swipeRefreshLayout.setRefreshing(false);

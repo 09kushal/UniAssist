@@ -88,7 +88,10 @@ public interface ApiService {
     Call<ApiResponse<PaginatedResponse<TutorResponse>>> getTutorList(
             @Header("Authorization") String authHeader,
             @Query("domain") String domain,
-            @Query("page") int page
+            @Query("page") int page,
+            @Query("min_price") Integer minPrice,
+            @Query("max_price") Integer maxPrice,
+            @Query("min_rating") Integer minRating
     );
 
     @GET("api/tutors/{id}/profile/")

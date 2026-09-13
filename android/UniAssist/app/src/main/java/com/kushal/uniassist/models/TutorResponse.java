@@ -29,6 +29,9 @@ public class TutorResponse {
     @SerializedName("total_sessions_done")
     private int totalSessionsDone = 0;
 
+    @SerializedName("total_earnings")
+    private double totalEarnings = 0.0;
+
     @SerializedName("average_rating")
     private String averageRating;
 
@@ -84,6 +87,10 @@ public class TutorResponse {
 
     public int getTotalSessionsDone() {
         return totalSessionsDone;
+    }
+
+    public double getTotalEarnings() {
+        return totalEarnings;
     }
     
     public float getAverageRatingFloat() {

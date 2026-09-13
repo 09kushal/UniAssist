@@ -243,6 +243,20 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:contentDescription="Search button" />
+
+                        <ImageView
+                            android:id="@+id/btnFilter"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_icon_circle"
+                            android:backgroundTint="#F3F4F6"
+                            android:padding="6dp"
+                            android:src="@drawable/ic_filter"
+                            app:tint="@color/primary"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="Filter button" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 

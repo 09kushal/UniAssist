@@ -204,7 +204,7 @@ public class TutorEditProfileActivity extends AppCompatActivity {
         List<AvailabilitySlot> slots = currentProfile.getAvailabilitySlots();
         if (slots != null) {
             for (AvailabilitySlot slot : slots) {
-                View view = LayoutInflater.from(this).inflate(R.layout.item_availability_edit, llAvailabilityList, false);
+                View view = LayoutInflater.from(this).inflate(R.layout.item_availability_tutor_edit, llAvailabilityList, false);
                 TextView tvSlot = view.findViewById(R.id.tvSlotInfo);
                 ImageView ivDelete = view.findViewById(R.id.ivDelete);
 
@@ -564,10 +564,24 @@ public class TutorEditProfileActivity extends AppCompatActivity {
         if (llDocumentList == null) return;
         llDocumentList.removeAllViews();
         for (TutorDocument doc : docs) {
-            TextView tv = new TextView(this);
-            tv.setText(doc.getDocType() + " - " + doc.getUploadedAt());
-            tv.setPadding(0, 8, 0, 8);
-            llDocumentList.addView(tv);
+            View view = LayoutInflater.from(this).inflate(R.layout.item_document_tutor_edit, llDocumentList, false);
+            TextView tvType = view.findViewById(R.id.tvDocType);
+            TextView tvDate = view.findViewById(R.id.tvUploadDate);
+            ImageView ivIcon = view.findViewById(R.id.ivDocIcon);
+
+            String typeDisplay = doc.getDocType();
+            // Map code to display name
+            for (int i = 0; i < docTypeValues.length; i++) {
+                if (docTypeValues[i].equals(doc.getDocType())) {
+                    typeDisplay = docTypeDisplay[i];
+                    break;
+                }
+            }
+
+            tvType.setText(typeDisplay);
+            tvDate.setText("Uploaded on: " + doc.getUploadedAt());
+            
+            llDocumentList.addView(view);
         }
     }
 

@@ -48,7 +48,8 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:scaleType="centerCrop"
-                android:background="@drawable/bg_teal_circle" />
+                android:background="@drawable/bg_teal_circle"
+                android:src="@drawable/ic_student_silhouette" />
 
             <TextView
                 android:id="@+id/tvAvatarLetter"
@@ -65,16 +66,15 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="bottom|end"
-                android:background="@color/accent"
                 android:clickable="true"
                 android:focusable="true">
 
-                <TextView
+                <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="📷"
-                    android:textSize="14sp" />
+                    android:padding="6dp"
+                    android:src="@drawable/ic_camera_modern"
+                    app:tint="@color/accent" />
             </FrameLayout>
         </FrameLayout>
 
@@ -106,7 +106,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:hint="@string/full_name"
-                    app:startIconDrawable="@android:drawable/ic_menu_myplaces"
+                    app:startIconDrawable="@drawable/ic_person_modern"
                     app:startIconTint="@color/accent">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -125,7 +125,7 @@
                     android:hint="@string/email"
                     app:endIconDrawable="@android:drawable/ic_lock_lock"
                     app:endIconTint="@color/text_hint"
-                    app:startIconDrawable="@android:drawable/ic_dialog_email"
+                    app:startIconDrawable="@drawable/ic_mail_modern"
                     app:startIconTint="@color/accent">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -154,6 +154,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     android:layout_marginBottom="12dp"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:hint="Grade / University">
@@ -181,6 +182,17 @@
                         android:padding="16dp"
                         android:lines="2"/>
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <Button
+                    android:id="@+id/btnUpdateAcademic"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="@color/accent"
+                    android:text="Update"
+                    android:textAllCaps="false"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp" />
 
                 <View
                     android:layout_width="match_parent"

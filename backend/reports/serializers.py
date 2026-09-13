@@ -55,14 +55,14 @@ class LatenessReportSerializer(serializers.ModelSerializer):
 
 class FileLatenessReportSerializer(serializers.Serializer):
     """Input serializer — student files a lateness report against tutor."""
-    session_id  = serializers.IntegerField()
+    booking_id  = serializers.IntegerField()
     delay_range = serializers.ChoiceField(choices=LatenessReport.DelayRange.choices)
     description = serializers.CharField()
 
 
 class FileTutorReportSerializer(serializers.Serializer):
     """Input serializer — tutor files a lateness report against student."""
-    session_id  = serializers.IntegerField()
+    booking_id  = serializers.IntegerField()
     delay_range = serializers.ChoiceField(choices=LatenessReport.DelayRange.choices)
     description = serializers.CharField()
 

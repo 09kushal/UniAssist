@@ -249,7 +249,7 @@ public class TutorListActivity extends AppCompatActivity {
             String domainParam = currentDomain.isEmpty() ? null : currentDomain;
             Log.d("TutorDebug", "Loading tutors... domain=" + domainParam + ", page=" + currentPage);
 
-            apiService.getTutorList(authHeader, domainParam, currentPage).enqueue(new Callback<ApiResponse<PaginatedResponse<TutorResponse>>>() {
+            apiService.getTutorList(authHeader, domainParam, currentPage, null, null, null).enqueue(new Callback<ApiResponse<PaginatedResponse<TutorResponse>>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<PaginatedResponse<TutorResponse>>> call, Response<ApiResponse<PaginatedResponse<TutorResponse>>> response) {
                     isLoading = false;

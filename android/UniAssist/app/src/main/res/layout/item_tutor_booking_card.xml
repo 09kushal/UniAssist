@@ -50,8 +50,9 @@
             android:paddingHorizontal="12dp"
             android:paddingVertical="4dp"
             android:text="Subject"
-            android:textColor="@color/accent"
-            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
             android:visibility="gone" />
 
         <TextView

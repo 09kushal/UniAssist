@@ -134,6 +134,7 @@ public class TutorBookingsActivity extends AppCompatActivity {
             else if (checkedId == R.id.chipPending) currentStatus = "pending";
             else if (checkedId == R.id.chipAccepted) currentStatus = "accepted";
             else if (checkedId == R.id.chipRejected) currentStatus = "rejected";
+            else if (checkedId == R.id.chipExpired) currentStatus = "expired";
             
             currentPage = 1;
             hasMoreData = true;

@@ -31,6 +31,7 @@ public class EsewaPaymentActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private int bookingId;
     private String amount;
+    private boolean isHandled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,13 +69,17 @@ public class EsewaPaymentActivity extends AppCompatActivity {
                 Log.d("eSewa", "Loading: " + url);
 
                 // Detect success redirect
-                if (url.contains("payment/esewa/success") || (url.contains("success") && url.contains("oid="))) {
+                if (url.contains("payment/esewa/success") || 
+                    (url.contains("success") && url.contains("oid=")) ||
+                    url.contains("api/payments/callback")) {
                     progressBar.setVisibility(View.GONE);
                     handlePaymentSuccess();
                 }
 
                 // Detect failure redirect
-                if (url.contains("payment/esewa/failure") || url.contains("failure")) {
+                if (url.contains("payment/esewa/failure") || 
+                    url.contains("failure") ||
+                    url.contains("api/payments/failed")) {
                     progressBar.setVisibility(View.GONE);
                     handlePaymentFailure();
                 }
@@ -177,6 +182,8 @@ public class EsewaPaymentActivity extends AppCompatActivity {
     }
 
     private void handlePaymentSuccess() {
+        if (isHandled) return;
+        isHandled = true;
         Toast.makeText(this, "Payment successful! Session is now scheduled.", Toast.LENGTH_LONG).show();
         Intent result = new Intent();
         result.putExtra("payment_success", true);
@@ -186,6 +193,8 @@ public class EsewaPaymentActivity extends AppCompatActivity {
     }
 
     private void handlePaymentFailure() {
+        if (isHandled) return;
+        isHandled = true;
         Toast.makeText(this, "Payment failed or cancelled.", Toast.LENGTH_LONG).show();
         setResult(RESULT_CANCELED);
         finish();

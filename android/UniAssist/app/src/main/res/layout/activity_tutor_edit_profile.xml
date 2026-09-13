@@ -66,16 +66,23 @@
                         android:src="@drawable/ic_tutor_placeholder"
                         app:shapeAppearanceOverlay="@style/CircleImage" />
 
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:layout_alignBottom="@id/ivProfile"
                         android:layout_alignEnd="@id/ivProfile"
                         android:layout_margin="4dp"
-                        android:src="@android:drawable/ic_menu_camera"
-                        app:backgroundTint="@color/accent"
-                        app:fabSize="mini"
-                        app:tint="@color/white" />
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="@color/white">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="6dp"
+                            android:src="@android:drawable/ic_menu_camera"
+                            app:tint="@color/accent" />
+                    </com.google.android.material.card.MaterialCardView>
                 </RelativeLayout>
 
                 <TextView
@@ -91,30 +98,44 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <!-- Basic Information -->
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Basic Information"
-                        android:textColor="@color/primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="18dp"
+                            android:background="@color/primary"
+                            android:layout_marginEnd="8dp"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Basic Information"
+                            android:textColor="@color/primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:hint="Tell students about yourself...">
+                        android:layout_marginBottom="16dp"
+                        android:hint="Tell students about yourself..."
+                        app:startIconDrawable="@android:drawable/ic_menu_edit"
+                        app:startIconTint="@color/accent">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etBio"
@@ -129,9 +150,10 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:hint="e.g. 500"
-                        app:prefixText="NPR ">
+                        android:hint="Price per session"
+                        app:prefixText="NPR "
+                        app:startIconDrawable="@android:drawable/ic_menu_send"
+                        app:startIconTint="@color/accent">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etPricing"
@@ -141,45 +163,66 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- Teaching Domain -->
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
-                        android:text="Teaching Domain"
-                        android:textColor="@color/primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="28dp"
+                        android:layout_marginBottom="12dp">
+                        <View
+                            android:layout_width="4dp"
+                            android:layout_height="18dp"
+                            android:background="@color/primary"
+                            android:layout_marginEnd="8dp"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Teaching Domain"
+                            android:textColor="@color/primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chipDomain"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
                         android:text="Academic"
                         android:clickable="false"
-                        app:chipBackgroundColor="@color/accent_light"
+                        android:textColor="@color/primary"
+                        app:chipBackgroundColor="#E8EAF6"
                         app:chipIcon="@android:drawable/ic_menu_agenda"
-                        app:chipIconTint="@color/accent" />
+                        app:chipIconTint="@color/primary"
+                        app:chipStrokeWidth="0dp" />
 
                     <!-- Subjects -->
                     <LinearLayout
                         android:id="@+id/llSubjectsSection"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="28dp"
                         android:orientation="vertical">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp">
+                            <View
+                                android:layout_width="4dp"
+                                android:layout_height="18dp"
+                                android:background="@color/primary"
+                                android:layout_marginEnd="8dp"
+                                android:layout_centerVertical="true"/>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Subjects"
                                 android:textColor="@color/primary"
                                 android:textSize="16sp"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:layout_centerVertical="true"
+                                android:layout_marginStart="12dp"/>
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnAddSubject"
@@ -190,6 +233,7 @@
                                 android:text="Add Subject"
                                 android:textAllCaps="false"
                                 android:textColor="@color/accent"
+                                android:textStyle="bold"
                                 app:icon="@android:drawable/ic_input_add"
                                 app:iconTint="@color/accent" />
                         </RelativeLayout>
@@ -197,8 +241,7 @@
                         <com.google.android.material.chip.ChipGroup
                             android:id="@+id/chipGroupSubjects"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp" />
+                            android:layout_height="wrap_content" />
                     </LinearLayout>
 
                     <!-- Skills -->
@@ -206,20 +249,28 @@
                         android:id="@+id/llSkillsSection"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="28dp"
                         android:orientation="vertical">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="8dp">
+                            <View
+                                android:layout_width="4dp"
+                                android:layout_height="18dp"
+                                android:background="@color/primary"
+                                android:layout_marginEnd="8dp"
+                                android:layout_centerVertical="true"/>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Skills"
                                 android:textColor="@color/primary"
                                 android:textSize="16sp"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:layout_centerVertical="true"
+                                android:layout_marginStart="12dp"/>
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnAddSkill"
@@ -230,6 +281,7 @@
                                 android:text="Add Skill"
                                 android:textAllCaps="false"
                                 android:textColor="@color/accent"
+                                android:textStyle="bold"
                                 app:icon="@android:drawable/ic_input_add"
                                 app:iconTint="@color/accent" />
                         </RelativeLayout>
@@ -237,28 +289,35 @@
                         <com.google.android.material.chip.ChipGroup
                             android:id="@+id/chipGroupSkills"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp" />
+                            android:layout_height="wrap_content" />
                     </LinearLayout>
 
                     <!-- Availability -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="28dp"
                         android:orientation="vertical">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp">
+                            <View
+                                android:layout_width="4dp"
+                                android:layout_height="18dp"
+                                android:background="@color/primary"
+                                android:layout_marginEnd="8dp"
+                                android:layout_centerVertical="true"/>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Availability"
                                 android:textColor="@color/primary"
                                 android:textSize="16sp"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:layout_centerVertical="true"
+                                android:layout_marginStart="12dp"/>
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnAddAvailability"
@@ -269,6 +328,7 @@
                                 android:text="Add Slot"
                                 android:textAllCaps="false"
                                 android:textColor="@color/accent"
+                                android:textStyle="bold"
                                 app:icon="@android:drawable/ic_input_add"
                                 app:iconTint="@color/accent" />
                         </RelativeLayout>
@@ -277,7 +337,6 @@
                             android:id="@+id/llAvailabilityList"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
                             android:orientation="vertical" />
                     </LinearLayout>
 
@@ -285,46 +344,70 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="28dp"
                         android:orientation="vertical">
                         
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Verification Documents"
-                            android:textColor="@color/primary"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:orientation="horizontal">
-
-                            <Spinner
-                                android:id="@+id/spinnerDocType"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnUploadDocument"
-                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="16dp">
+                            <View
+                                android:layout_width="4dp"
+                                android:layout_height="18dp"
+                                android:background="@color/primary"
+                                android:layout_marginEnd="8dp"/>
+                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Upload"
-                                android:textAllCaps="false"
-                                android:textColor="@color/accent"
-                                app:icon="@android:drawable/ic_menu_upload"
-                                app:iconTint="@color/accent" />
+                                android:text="Verification Documents"
+                                android:textColor="@color/primary"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
                         </LinearLayout>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="1dp"
+                            app:strokeColor="#E5E7EB"
+                            app:cardBackgroundColor="#F9FAFB">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:padding="12dp">
+
+                                <Spinner
+                                    android:id="@+id/spinnerDocType"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="48dp"
+                                    android:layout_marginBottom="8dp" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btnUploadDocument"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="48dp"
+                                    android:text="Select and Upload"
+                                    android:textAllCaps="false"
+                                    android:textColor="@color/white"
+                                    android:textStyle="bold"
+                                    app:backgroundTint="@color/primary"
+                                    app:icon="@android:drawable/ic_menu_upload"
+                                    app:iconTint="@color/white"
+                                    app:cornerRadius="8dp" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
                         <LinearLayout
                             android:id="@+id/llDocumentList"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
                             android:orientation="vertical" />
                     </LinearLayout>
 

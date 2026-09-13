@@ -30,13 +30,6 @@
             android:layout_centerVertical="true"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Welcome back,"
-                android:textColor="@color/white"
-                android:textSize="14sp" />
-
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -47,9 +40,9 @@
                     android:id="@+id/tvWelcome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tutor Name"
+                    android:text="Welcome back,\nTutor Name"
                     android:textColor="@color/white"
-                    android:textSize="24sp"
+                    android:textSize="22sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -64,6 +57,14 @@
                     android:textColor="@color/white"
                     android:textSize="10sp" />
             </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UniAssist - Student Mentorship Portal"
+                android:textColor="#CCFFFFFF"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
 
         <FrameLayout
@@ -110,32 +111,37 @@
     <!-- Stats Row -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="80dp"
         android:layout_marginTop="-25dp"
         android:paddingHorizontal="16dp"
         android:weightSum="3">
 
         <androidx.cardview.widget.CardView
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_margin="4dp"
             android:layout_weight="1"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="12dp">
                 <TextView
                     android:id="@+id/tvTotalSessions"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="0"
                     android:textColor="@color/primary"
                     android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="12sp"
+                    app:autoSizeMaxTextSize="18sp" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -146,25 +152,30 @@
 
         <androidx.cardview.widget.CardView
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_margin="4dp"
             android:layout_weight="1"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="12dp">
                 <TextView
                     android:id="@+id/tvTutorRating"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="0.0"
                     android:textColor="@color/primary"
                     android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="12sp"
+                    app:autoSizeMaxTextSize="18sp" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -175,25 +186,30 @@
 
         <androidx.cardview.widget.CardView
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_margin="4dp"
             android:layout_weight="1"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="12dp">
                 <TextView
                     android:id="@+id/tvEarnings"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="NPR 0"
                     android:textColor="@color/primary"
                     android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="10sp"
+                    app:autoSizeMaxTextSize="16sp" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -226,8 +242,11 @@
                 android:orientation="vertical"
                 android:padding="16dp">
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:padding="14dp"
+                    android:background="@drawable/bg_icon_circle"
+                    android:backgroundTint="#E0F2F1"
                     android:src="@android:drawable/ic_menu_today"
                     app:tint="@color/accent" />
                 <TextView
@@ -255,8 +274,11 @@
                 android:orientation="vertical"
                 android:padding="16dp">
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:padding="14dp"
+                    android:background="@drawable/bg_icon_circle"
+                    android:backgroundTint="#E8EAF6"
                     android:src="@android:drawable/ic_menu_myplaces"
                     app:tint="@color/primary" />
                 <TextView
@@ -284,10 +306,13 @@
                 android:orientation="vertical"
                 android:padding="16dp">
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:padding="14dp"
+                    android:background="@drawable/bg_icon_circle"
+                    android:backgroundTint="#E8F5E9"
                     android:src="@android:drawable/ic_menu_send"
-                    app:tint="@color/accent" />
+                    app:tint="@color/success" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -313,10 +338,13 @@
                 android:orientation="vertical"
                 android:padding="16dp">
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:padding="14dp"
+                    android:background="@drawable/bg_icon_circle"
+                    android:backgroundTint="#FFF8E1"
                     android:src="@android:drawable/ic_menu_sort_by_size"
-                    app:tint="@color/primary" />
+                    app:tint="@color/warning" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -332,15 +360,16 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogout"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
-        android:backgroundTint="@color/error"
         android:padding="16dp"
         android:text="Logout"
-        android:textColor="@color/white"
+        android:textColor="@color/error"
+        app:strokeColor="@color/error"
         app:cornerRadius="12dp" />
 
     </LinearLayout>

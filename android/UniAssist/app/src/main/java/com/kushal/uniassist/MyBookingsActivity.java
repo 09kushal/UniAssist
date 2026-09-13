@@ -4,11 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -152,8 +156,7 @@ public class MyBookingsActivity extends AppCompatActivity {
 
             @Override
             public void onReport(BookingResponse booking) {
-                // To be implemented
-                Toast.makeText(MyBookingsActivity.this, "Reporting not implemented yet", Toast.LENGTH_SHORT).show();
+                showLatenessReportDialog(booking);
             }
 
             @Override
@@ -170,6 +173,7 @@ public class MyBookingsActivity extends AppCompatActivity {
             if (checkedId == R.id.chipPending) currentFilter = "pending";
             else if (checkedId == R.id.chipAccepted) currentFilter = "accepted";
             else if (checkedId == R.id.chipCompleted) currentFilter = "completed";
+            else if (checkedId == R.id.chipExpired) currentFilter = "expired";
             else currentFilter = "all";
             
             applyFilter(currentFilter);
@@ -262,6 +266,83 @@ public class MyBookingsActivity extends AppCompatActivity {
 
     private void cancelBooking(BookingResponse booking) {
         Toast.makeText(this, "Cancelling booking #" + booking.getId(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void showLatenessReportDialog(BookingResponse booking) {
+        View view = getLayoutInflater().inflate(R.layout.dialog_report_lateness, null);
+        Spinner spinner = view.findViewById(R.id.spinnerDelayRange);
+        EditText etDesc = view.findViewById(R.id.etDescription);
+        View btnCancel = view.findViewById(R.id.btnCancel);
+        View btnSubmit = view.findViewById(R.id.btnSubmit);
+
+        String[] displayOptions = {"5–15 Minutes", "15–30 Minutes", "30+ Minutes", "No Show"};
+        String[] valueOptions = {"5_15min", "15_30min", "30_plus", "no_show"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, displayOptions);
+        spinner.setAdapter(adapter);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view)
+                .create();
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnSubmit.setOnClickListener(v -> {
+            String delayRange = valueOptions[spinner.getSelectedItemPosition()];
+            String description = etDesc.getText().toString().trim();
+
+            if (description.isEmpty()) {
+                Toast.makeText(this, "Please provide a short description", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            submitLatenessReport(booking.getId(), delayRange, description, dialog);
+        });
+
+        dialog.show();
+    }
+
+    private void submitLatenessReport(int bookingId, String delayRange, String description, AlertDialog dialog) {
+        progressBar.setVisibility(View.VISIBLE);
+        String token = "Bearer " + sessionManager.getAccessToken();
+
+        org.json.JSONObject json = new org.json.JSONObject();
+        try {
+            json.put("booking_id", bookingId);
+            json.put("delay_range", delayRange);
+            json.put("description", description);
+        } catch (org.json.JSONException e) {
+            e.printStackTrace();
+        }
+
+        okhttp3.RequestBody body = okhttp3.RequestBody.create(
+                json.toString(), okhttp3.MediaType.parse("application/json"));
+
+        apiService.fileLatenessReport(token, body).enqueue(new Callback<ApiResponse<Object>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
+                progressBar.setVisibility(View.GONE);
+                if (response.isSuccessful()) {
+                    Toast.makeText(MyBookingsActivity.this, "✅ Report filed successfully.", Toast.LENGTH_LONG).show();
+                    dialog.dismiss();
+                } else {
+                    String msg = "Failed to file report";
+                    try {
+                        if (response.errorBody() != null) {
+                            org.json.JSONObject err = new org.json.JSONObject(response.errorBody().string());
+                            msg = err.optString("message", msg);
+                        }
+                    } catch (Exception ignored) {}
+                    Toast.makeText(MyBookingsActivity.this, msg, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(MyBookingsActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
