@@ -191,10 +191,12 @@ CSRF_TRUSTED_ORIGINS = [
 #   1. Use a Gmail account with 2-Step Verification enabled.
 #   2. Generate an App Password at: https://myaccount.google.com/apppasswords
 #   3. Update your backend/.env file with the credentials.
-import certifi
-import os
-os.environ['SSL_CERT_FILE'] = certifi.where()
-os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
+try:
+    import certifi
+    os.environ['SSL_CERT_FILE'] = certifi.where()
+    os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
+except ImportError:
+    pass
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
