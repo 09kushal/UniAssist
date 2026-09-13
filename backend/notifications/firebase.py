@@ -1,13 +1,14 @@
 import os
-import firebase_admin
-from firebase_admin import credentials, messaging
-from django.conf import settings
 import logging
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 # Initialize Firebase App
 try:
+    import firebase_admin
+    from firebase_admin import credentials, messaging
+
     if not firebase_admin._apps:
         cred_path = os.path.join(settings.BASE_DIR, 'firebase_credentials.json')
         if os.path.exists(cred_path):
@@ -16,11 +17,17 @@ try:
             logger.info("Firebase Admin initialized successfully.")
         else:
             logger.warning(f"Firebase credentials not found at {cred_path}")
+except ImportError:
+    firebase_admin = None
+    messaging = None
+    logger.warning("firebase_admin package not installed. Push notifications disabled.")
 except Exception as e:
+    firebase_admin = None
+    messaging = None
     logger.error(f"Error initializing Firebase Admin: {e}")
 
 def send_fcm_notification(device_token, title, body):
-    if not firebase_admin._apps:
+    if not firebase_admin or not getattr(firebase_admin, '_apps', None):
         logger.warning("Firebase not initialized. Cannot send push notification.")
         return False
         
