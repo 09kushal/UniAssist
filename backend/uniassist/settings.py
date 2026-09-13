@@ -78,11 +78,11 @@ WSGI_APPLICATION = 'uniassist.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'uniassist_db',
-        'USER': 'kushal',
-        'PASSWORD': 'uniassist123',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'NAME': os.getenv('DB_NAME', 'uniassist_db'),
+        'USER': os.getenv('DB_USER', 'kushal'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'uniassist123'),
+        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+        'PORT': os.getenv('DB_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
