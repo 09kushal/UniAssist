@@ -17,11 +17,11 @@ def _ensure_admin():
             User.objects.create_superuser(email=email, full_name='UniAssist Admin', password=pwd)
         else:
             u = User.objects.get(email=email)
-            if not u.is_superuser or not u.is_staff or not u.check_password(pwd):
-                u.set_password(pwd)
-                u.is_superuser = True
-                u.is_staff = True
-                u.save()
+            u.set_password(pwd)
+            u.is_active = True
+            u.is_superuser = True
+            u.is_staff = True
+            u.save()
     except Exception:
         pass
 

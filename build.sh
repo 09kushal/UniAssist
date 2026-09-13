@@ -23,6 +23,7 @@ if not User.objects.filter(email=email).exists():
 else:
     u = User.objects.get(email=email)
     u.set_password(pwd)
+    u.is_active = True
     u.is_superuser = True
     u.is_staff = True
     u.save()
