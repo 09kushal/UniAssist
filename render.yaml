@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: uniassist-backend
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: "./build.sh"
+    startCommand: "cd backend && gunicorn uniassist.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: USE_SQLITE
+        value: "True"
+      - key: CORS_ALLOW_ALL_ORIGINS
+        value: "True"

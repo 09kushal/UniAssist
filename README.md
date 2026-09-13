@@ -123,9 +123,15 @@ UniAssist/
 
 ---
 
-## 🚀 Quick Start & Setup Guide
+## ☁️ Cloud Deployment & Free Hosting
 
-### 1. Backend Setup
+Want to host the backend online 24/7 for free? Follow our comprehensive **[Cloud Deployment Guide](DEPLOYMENT.md)** covering 1-click **Render.com** deployment (via [render.yaml](render.yaml)), free cloud database options (SQLite, TiDB Serverless MySQL, Render PostgreSQL), and updating the Android mobile client.
+
+---
+
+## 🚀 Quick Start & Local Setup Guide
+
+### 1. Local Backend Setup
 
 1. **Clone the repository**:
    ```bash

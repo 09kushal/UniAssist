@@ -6,10 +6,11 @@ db.sqlite3
 .idea/
 .vscode/
 .DS_Store
-docs/
 .env
 backend/firebase_credentials.json
 backend/jaas_private.pk
 media/
 *.pk
 backend/.env.save
+staticfiles/
+backend/staticfiles/
