@@ -45,7 +45,7 @@ If you prefer setting it up manually:
 
 Your live API will be available at:
 ```
-https://uniassist-backend.onrender.com/
+https://uniassist-backend-nlyq.onrender.com/
 ```
 
 ---
@@ -70,13 +70,13 @@ You have 3 free options for the backend database:
 
 ## 📱 Updating the Android Mobile App
 
-Once your backend is live on Render (e.g., `https://uniassist-backend.onrender.com/`):
+Once your backend is live on Render (e.g., `https://uniassist-backend-nlyq.onrender.com/`):
 
 1. Open `UniAssist/android/UniAssist` in Android Studio.
 2. Open [ApiClient.java](file:///Users/xxx/UniAssist/android/UniAssist/app/src/main/java/com/kushal/uniassist/network/ApiClient.java).
 3. Update `BASE_URL`:
    ```java
-   private static final String BASE_URL = "https://uniassist-backend.onrender.com/";
+   private static final String BASE_URL = "https://uniassist-backend-nlyq.onrender.com/";
    ```
 4. Rebuild the app or compile a new release APK.
 

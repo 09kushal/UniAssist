@@ -1,6 +1,7 @@
 # UniAssist 🎓
 
 [![Live Showcase & Simulator](https://img.shields.io/badge/Live_Showcase-GitHub_Pages-00A884?style=for-the-badge&logo=github&logoColor=white)](https://09kushal.github.io/UniAssist/)
+[![Live Backend API](https://img.shields.io/badge/Live_API-Render.com-46E3B7?style=for-the-badge&logo=render&logoColor=black)](https://uniassist-backend-nlyq.onrender.com/api/tutors/list/)
 [![Download APK](https://img.shields.io/badge/Download_APK-v1.0.0_(71MB)-blue?style=for-the-badge&logo=android&logoColor=white)](https://github.com/09kushal/UniAssist/releases/download/v1.0.0/UniAssist-v1.0.apk)
 [![Android SDK](https://img.shields.io/badge/Platform-Android_34-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/09kushal/UniAssist)
 [![Django Backend](https://img.shields.io/badge/Backend-Django_REST_Framework-092E20?style=for-the-badge&logo=django&logoColor=white)](https://github.com/09kushal/UniAssist)
@@ -8,7 +9,8 @@
 [![Institution](https://img.shields.io/badge/Institution-Oxford_College_of_Eng._%26_Mgmt.-orange?style=for-the-badge)](https://github.com/09kushal/UniAssist)
 
 > 🌐 **Live Web Showcase & Interactive Mobile Simulator**: [https://09kushal.github.io/UniAssist/](https://09kushal.github.io/UniAssist/)  
-> 📥 **Direct APK Download**: [Download UniAssist-v1.0.apk](https://github.com/09kushal/UniAssist/releases/download/v1.0.0/UniAssist-v1.0.apk) (Ready to install on Android 8.0+)
+> ⚡ **Live Backend REST API**: [https://uniassist-backend-nlyq.onrender.com/](https://uniassist-backend-nlyq.onrender.com/)  
+> 📥 **Direct APK Download**: [Download UniAssist-v1.0.apk](https://github.com/09kushal/UniAssist/releases/download/v1.0.0/UniAssist-v1.0.apk) (Configured for Live Cloud Backend)
 
 **UniAssist** is an on-demand peer-tutoring and academic consultation platform connecting university students with verified student tutors. It features end-to-end booking workflows, secure digital payments via eSewa, live encrypted video sessions powered by 8x8 JaaS (Jitsi as a Service), Firebase Cloud Messaging (FCM) push notifications, and dispute/lateness reporting.
 

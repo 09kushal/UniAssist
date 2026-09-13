@@ -12,7 +12,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
 
-    private static final String BASE_URL = "https://yin-elongated-studio.ngrok-free.dev/";
+    // Production Cloud Backend on Render
+    private static final String BASE_URL = "https://uniassist-backend-nlyq.onrender.com/";
+    // Local / Ngrok fallback:
+    // private static final String BASE_URL = "https://yin-elongated-studio.ngrok-free.dev/";
     private static Retrofit retrofit = null;
     private static Context appContext;
 
