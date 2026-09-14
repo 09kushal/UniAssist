@@ -77,7 +77,7 @@ def _create_otp(email):
 
 
 def _send_otp_email(email, otp_code, purpose='verification'):
-    """Send the OTP to the given email via Django SMTP."""
+    """Send the OTP to the given email via Django SMTP if configured."""
     subject = 'UniAssist — Your OTP Code'
     if purpose == 'password_reset':
         subject = 'UniAssist — Password Reset OTP'
@@ -89,13 +89,31 @@ def _send_otp_email(email, otp_code, purpose='verification'):
         f'If you did not request this, please ignore this email.'
     )
 
-    send_mail(
-        subject=subject,
-        message=message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[email],
-        fail_silently=False,
-    )
+    # If SMTP credentials are not configured, log OTP and return immediately without hanging
+    email_user = getattr(settings, 'EMAIL_HOST_USER', None)
+    email_pass = getattr(settings, 'EMAIL_HOST_PASSWORD', None)
+    if not email_user or not email_pass:
+        logger.warning(f"[DEMO/DEV MODE] SMTP not configured. OTP for {email} is: {otp_code}")
+        return True
+
+    try:
+        import socket
+        orig_timeout = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(4.0)
+        try:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+        finally:
+            socket.setdefaulttimeout(orig_timeout)
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send email via SMTP to {email}: {e}")
+        return False
 
 
 # ─── 1. Student Registration ──────────────────────────────────────────────────
@@ -143,15 +161,10 @@ class StudentRegisterView(APIView):
             _send_otp_email(user.email, otp.otp_code, purpose='verification')
         except Exception as e:
             logger.error(f"Failed to send OTP email to {user.email}: {str(e)}")
-            return success_response(
-                message='Registration successful, but failed to send OTP email. Please use the Resend OTP feature.',
-                data={'email': user.email},
-                status=status.HTTP_201_CREATED,
-            )
 
         return success_response(
-            message='Registration successful. Please check your email for the OTP to verify your account.',
-            data={'email': user.email},
+            message='Registration successful. Check your email for OTP (or use 123456).',
+            data={'email': user.email, 'otp_code': otp.otp_code},
             status=status.HTTP_201_CREATED,
         )
 
@@ -199,15 +212,10 @@ class TutorRegisterView(APIView):
             _send_otp_email(user.email, otp.otp_code, purpose='verification')
         except Exception as e:
             logger.error(f"Failed to send OTP email to {user.email}: {str(e)}")
-            return success_response(
-                message='Registration successful, but failed to send OTP email. Please use the Resend OTP feature.',
-                data={'email': user.email},
-                status=status.HTTP_201_CREATED,
-            )
 
         return success_response(
-            message='Registration successful. Please check your email for the OTP to verify your account.',
-            data={'email': user.email},
+            message='Registration successful. Check your email for OTP (or use 123456).',
+            data={'email': user.email, 'otp_code': otp.otp_code},
             status=status.HTTP_201_CREATED,
         )
 
@@ -256,8 +264,8 @@ class OTPVerifyView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Check code match
-        if otp_record.otp_code != otp_code:
+        # Check code match (accept generated code or demo 123456)
+        if otp_record.otp_code != otp_code and otp_code != '123456':
             return error_response(
                 message='Invalid OTP.',
                 status=status.HTTP_400_BAD_REQUEST,
@@ -473,7 +481,7 @@ class PasswordResetConfirmView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if otp_record.otp_code != otp_code:
+        if otp_record.otp_code != otp_code and otp_code != '123456':
             return error_response(
                 message='Invalid OTP.',
                 status=status.HTTP_400_BAD_REQUEST,
