@@ -48,6 +48,13 @@ Your live API will be available at:
 https://uniassist-backend-nlyq.onrender.com/
 ```
 
+### Django Admin Portal:
+```
+https://uniassist-backend-nlyq.onrender.com/admin/
+```
+* **Username / Email**: `admin@uniassist.com`
+* **Password**: `Admin@12345`
+
 ---
 
 ## 🗄️ Database Options for Cloud Deployment
