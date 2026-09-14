@@ -18,10 +18,29 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
 
 from reports.views import AdminDashboardSummaryView
 
+
+def home_view(request):
+    """Root health-check — confirms the API is live."""
+    return JsonResponse({
+        "status": "✅ UniAssist API is live",
+        "admin_portal": request.build_absolute_uri('/admin/'),
+        "api_docs": {
+            "tutors":        request.build_absolute_uri('/api/tutors/list/'),
+            "auth_register": request.build_absolute_uri('/api/auth/register/student/'),
+            "auth_login":    request.build_absolute_uri('/api/auth/login/'),
+        },
+        "github": "https://github.com/09kushal/UniAssist",
+        "showcase": "https://09kushal.github.io/UniAssist/",
+    })
+
 urlpatterns = [
+    # Root health-check
+    path('', home_view, name='home'),
+
     path('admin/', admin.site.urls),
 
     # Authentication & Accounts
